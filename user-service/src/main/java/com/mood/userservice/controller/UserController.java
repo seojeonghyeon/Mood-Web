@@ -4,8 +4,8 @@ import com.mood.userservice.decode.DecodeUserToken;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.service.UserService;
 import com.mood.userservice.vo.RequestUser;
+import com.mood.userservice.vo.ResponseUser;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,33 +48,60 @@ public class UserController {
         return result;
     }
 
-    //미완성
     @PostMapping("/regist")
-    public ResponseEntity createUser(@RequestBody RequestUser user){
+    public ResponseEntity createUser(@RequestBody RequestUser user, HttpServletResponse response){
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(user, UserDto.class);
         userService.createUser(userDto);
 
-        //
+        //function, Matching Users
 
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        String token = Jwts.builder()
+                .setSubject(userDto.getUserUid())
+                .setExpiration(new Date(System.currentTimeMillis()+Long.parseLong(env.getProperty("token.expiration_time"))))
+                .signWith(SignatureAlgorithm.HS512, env.getProperty("token.secret"))
+                .compact();
+        response.addHeader("userToken", token);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
-    //미완성
-    @PostMapping("resetPassword")
+    @PostMapping("/resetPassword")
     public ResponseEntity resetPassword(@RequestHeader("userToken") String userToken,@RequestBody RequestUser requestUser){
         DecodeUserToken decodeUserToken = new DecodeUserToken();
         String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
         if(userUid.equals(null)){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(requestUser);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseUser());
         }
         if(requestUser.getPhoneNum().equals(null) || requestUser.getPassword().equals(null)){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(requestUser);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseUser());
         }
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
-        return ResponseEntity.status(HttpStatus.OK).body(requestUser);
+        //Service, Get User info from userUid, phoneNum
+        //Set new password
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
+    }
+
+    @PostMapping("/checkPhoneNum")
+    public ResponseEntity checkPhoneNumber(@RequestBody RequestUser requestUser){
+        if(requestUser.getPhoneNum().isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        if(userService.getUserPhoneNumber(requestUser.getPhoneNum()))
+            return ResponseEntity.status(HttpStatus.IM_USED).body(new ResponseUser());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
+    }
+
+    @PostMapping("/findByPassword")
+    public ResponseEntity findByPassword(@RequestBody RequestUser requestUser){
+//        if(requestUser.getPhoneNum().isEmpty())
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+//        if(!userService.getUserPhoneNumber(requestUser.getPhoneNum()))
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseUser());
+        userService.sendCreditNumber(requestUser.getPhoneNum());
+        return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
     }
 }
