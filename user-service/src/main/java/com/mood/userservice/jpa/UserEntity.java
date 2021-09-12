@@ -70,6 +70,9 @@ public class UserEntity {
     @ColumnDefault("false")
     private boolean userLock;
 
+    @Column(nullable = true)
+    private int creditNumber;
+
     @Column(nullable = false)
     @ColumnDefault("false")
     private boolean disabled;

@@ -95,12 +95,22 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
+//    @PostMapping("/findByEmail")
+//    public ResponseEntity findByEmail(@RequestBody RequestUser requestUser){
+//
+//    }
+
+//    @PostMapping("/certificateNumber")
+//    public ResponseEntity certificateNumber(@RequestBody String numberId){
+//
+//    }
+
     @PostMapping("/findByPassword")
     public ResponseEntity findByPassword(@RequestBody RequestUser requestUser){
-//        if(requestUser.getPhoneNum().isEmpty())
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
-//        if(!userService.getUserPhoneNumber(requestUser.getPhoneNum()))
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseUser());
+        if(requestUser.getPhoneNum().isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        if(!userService.getUserPhoneNumber(requestUser.getPhoneNum()))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseUser());
         userService.sendCreditNumber(requestUser.getPhoneNum());
         return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
     }

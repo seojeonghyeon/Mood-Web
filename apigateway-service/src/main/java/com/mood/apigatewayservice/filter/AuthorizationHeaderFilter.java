@@ -23,7 +23,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         this.env =env;
     }
 
-    public static class Config{}
+    public static class Config{
+
+    }
 
     @Override
     public GatewayFilter apply(Config config) {

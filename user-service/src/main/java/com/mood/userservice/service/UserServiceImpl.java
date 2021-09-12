@@ -88,21 +88,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void sendCreditNumber(String phoneNum) {
-        String message = "[Mood] 본인인증 번호는"+createRandomNumber()+"입니다.";
+        int randomNumber = createRandomNumber();
+        String message = "[Mood] 본인인증 번호는 ["+randomNumber+"] 입니다.";
         sendMessage(message, phoneNum);
+        UserEntity userEntity = userRepository.findByPhoneNum(phoneNum);
+        userEntity.setCreditNumber(randomNumber);
+        userRepository.save(userEntity);
     }
-    public String createRandomNumber(){
+    public int createRandomNumber(){
         Random random = new Random();
-        String number = " ["+(random.nextInt(8888)+1111)+"] ";
+        int number = (random.nextInt(8888)+1111);
         return number;
     }
 
     public void sendMessage(String message, String toNumber){
         //Confirm the function, Environment wtf..
         log.info("Before send message : "+LocalDateTime.now()+" = To : "+toNumber+" Message : "+message);
-        String apiKey="";                              //env.getProperty("messaging.apiKey");
-        String apiSecret="";           //env.getProperty("messaging.apiSecret");
-        String fromNumber= "";                              //env.getProperty("messaging.fromNumber");
+
+        String apiKey=env.getProperty("messaging.apiKey");
+        String apiSecret=env.getProperty("messaging.apiSecret");
+        String fromNumber=env.getProperty("messaging.fromNumber");
+        log.info("Before send message : "+LocalDateTime.now()+" = From : "+fromNumber+" apiKey : "+apiKey+" apiSecret : "+apiSecret);
 
         Message coolsms = new Message(apiKey, apiSecret);
 
