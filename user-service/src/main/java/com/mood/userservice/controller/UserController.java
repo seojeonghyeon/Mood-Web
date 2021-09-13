@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/user-service")
 public class UserController {
     private Environment env;
     private UserService userService;
