@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-public class matchingBlockUser {
+public class MatchingBlockUser {
     //matching block Uid
     private String matchingBlockUid;
 

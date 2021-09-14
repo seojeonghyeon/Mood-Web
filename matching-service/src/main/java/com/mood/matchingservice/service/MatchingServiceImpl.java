@@ -8,6 +8,8 @@ import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class MatchingServiceImpl implements MatchingService{
@@ -25,5 +27,16 @@ public class MatchingServiceImpl implements MatchingService{
     @Override
     public MatchingUserDto createMatchingUsers(MatchingUserDto matchingUser) {
         return null;
+    }
+
+    @Override
+    public List<MatchingUserDto> getMatchingUsers() {
+
+        return null;
+    }
+
+    @Override
+    public void updateMatchingUsers(MatchingUserDto matchingUserDto) {
+
     }
 }
