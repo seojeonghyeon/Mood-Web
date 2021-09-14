@@ -60,11 +60,20 @@ public class UserEntity {
     private LocalDateTime recentLoginTime;
 
     @Column(nullable = false)
+    private LocalDateTime matchingTime;
+
+    @Column(nullable = false)
+    private LocalDateTime nextMatchingTime;
+
+    @Column(nullable = false)
     @ColumnDefault("true")
     private boolean resetMatching;
 
     @Column(nullable = true)
     private String creditPwd;
+
+    @Column(nullable = false)
+    private boolean creditEnabled;
 
     @Column(nullable = false)
     @ColumnDefault("false")

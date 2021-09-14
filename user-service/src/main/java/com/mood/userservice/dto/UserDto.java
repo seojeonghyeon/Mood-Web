@@ -82,11 +82,20 @@ public class UserDto {
     private LocalDateTime createTimeAt;
     private LocalDateTime recentLoginTime;
 
+    //User's matching time
+    //watching ad, then nextMatchingTime is 15 update
+    //no watching ad, then next matching 6
+    private LocalDateTime matchingTime;
+    private LocalDateTime nextMatchingTime;
+
     //User is trying disabled a user's account, then reset 1 time. default is true.
     private boolean resetMatching;
 
     //Credit password
     private String creditPwd;
+
+    //Credit passing. isTrue, then can changing the password
+    private boolean creditEnabled;
 
     //Lock User's account
     private boolean userLock;
