@@ -64,6 +64,7 @@ public class UserDto {
     private LocalDateTime gradeEnd;
 
     //For matching, min and max age is hoped matching.
+    private int userAge;
     private int minAge;
     private int maxAge;
 

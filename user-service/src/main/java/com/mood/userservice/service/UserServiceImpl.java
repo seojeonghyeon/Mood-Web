@@ -19,6 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -59,6 +61,7 @@ public class UserServiceImpl implements UserService {
         userDto.setCreateTimeAt(LocalDateTime.now());
         userDto.setRecentLoginTime(LocalDateTime.now());
         userDto.setGradeStart(LocalDateTime.now());
+        userDto.setUserAge(updateUserAge(userDto));
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -127,5 +130,15 @@ public class UserServiceImpl implements UserService {
             System.out.println(e.getCode());
         }
         log.info("After send message");
+    }
+
+    public boolean updateMatchingUsers(UserDto userDto){
+
+        return false;
+    }
+    public int updateUserAge(UserDto userDto){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime birthdate = LocalDateTime.parse(userDto.getBirthdate(),formatter);
+        return LocalDateTime.now().getYear()-birthdate.getYear();
     }
 }

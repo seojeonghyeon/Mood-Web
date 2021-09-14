@@ -81,6 +81,9 @@ public class UserDetailEntity {
     private LocalDateTime gradeEnd;
 
     @Column(nullable = false)
+    private int userAge;
+
+    @Column(nullable = false)
     private int minAge;
 
     @Column(nullable = false)
@@ -91,4 +94,7 @@ public class UserDetailEntity {
 
     @Column(nullable = true)
     private int userGroup;
+
+    @Column(nullable = false)
+    private LocalDateTime recentLoginTime;
 }
