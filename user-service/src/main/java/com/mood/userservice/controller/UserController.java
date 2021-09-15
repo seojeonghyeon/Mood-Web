@@ -66,6 +66,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
+    //Reset User Password
     @PostMapping("/resetPassword")
     public ResponseEntity resetPassword(@RequestHeader("userToken") String userToken, @RequestBody RequestUser requestUser) {
         DecodeUserToken decodeUserToken = new DecodeUserToken();
@@ -85,6 +86,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
+    //Check Overlap of PhoneNumber
     @PostMapping("/checkPhoneNum")
     public ResponseEntity checkPhoneNumber(@RequestBody RequestUser requestUser) {
         if (requestUser.getPhoneNum().isEmpty())
@@ -97,6 +99,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(responseUser);
     }
 
+    //Find Email for User
     @PostMapping("/findByEmail")
     public ResponseEntity findByEmail(@RequestBody RequestUser requestUser) {
         if (requestUser.getPhoneNum().isEmpty())
@@ -109,6 +112,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(responseUser);
     }
 
+    //Find Password For User
     @PostMapping("/findByPassword")
     public ResponseEntity findByPassword(@RequestBody RequestUser requestUser) {
         if (requestUser.getPhoneNum().isEmpty())
@@ -120,6 +124,7 @@ public class UserController {
     }
 
 
+    //For AutoLogin
     @PostMapping("autoLogin")
     public ResponseEntity autoLogin(@RequestHeader("userToken") String userToken) {
         DecodeUserToken decodeUserToken = new DecodeUserToken();
@@ -127,11 +132,14 @@ public class UserController {
         if (userUid.equals(null)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseUser());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
     }
 
+
+    //send Certification Number to UserPhone
     @PostMapping("sendCertification")
-    public ResponseEntity sendCertification(@RequestBody RequestUser requestUser,@RequestBody String hashKey,@RequestBody RequestUser requestUser) {
+    public ResponseEntity sendCertification(@RequestBody RequestUser requestUser) {
         if (requestUser.getPhoneNum().equals(null)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         }
@@ -142,14 +150,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
-    //인증번호 같은지 확인, 올바르지 않은 값일 경우, 실패
+    //Check Certification Number
     @PostMapping("/certificateNumber")
     public ResponseEntity certificateNumber(@RequestBody String numberId) {
     }
 
     ;
 
-
+    //For #Mood Function , User and OtherUser Profile Return to Front
     @PostMapping("/getUser")
     public ResponseEntity getUser(@RequestHeader("userToken") String userToken, @RequestBody RequestProfile requestProfile) {
         DecodeUserToken decodeUserToken = new DecodeUserToken();
@@ -160,7 +168,7 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseProfile());
     }
-
+    //If pay for Coin or VIP (Once a pay, Day) Give Coin
     @PostMapping("purchaseVIP")
     public ResponseEntity purchaseVIP(@RequestHeader("userToken") String userToken, @RequestBody RequestPurchase requestPurchase) {
         DecodeUserToken decodeUserToken = new DecodeUserToken();
@@ -171,6 +179,7 @@ public class UserController {
 
     }
 
+    //Set Matching Attribute (phonenumber, NickName, MoodDistance, Loming, Location is Charged)
     @PostMapping("/setMatching")
     public ResponseEntity setMatching(@RequestHeader("userToken") String userToken, @RequestBody RequestUser requestUser) {
         DecodeUserToken decodeUserToken = new DecodeUserToken();
@@ -183,16 +192,17 @@ public class UserController {
 
         //Service. get all user info
         //set matching
-        //이해한 바로는 이런곳에 쓰는것같은디... 맞는지는....
+
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
+    //BlockPhoneNumber
     @PostMapping("/blockPhoneNums")
     public ResponseEntity blockPhoneNums(@RequestHeader("userToken") String userToken, @RequestBody) {
 
     }
 
-
+    //Reset PhoneNumber (After sendCertification complete)
     @PostMapping("/updatePhoneNum")
     public ResponseEntity updatePhoneNum(@RequestHeader("userToken") String userToken, @RequestBody RequestUser requestUser){
         DecodeUserToken decodeUserToken = new DecodeUserToken();
@@ -202,10 +212,14 @@ public class UserController {
         }
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        //Get. UserPhoneNumber -> After sendCertification
+        //set. UserPhoneNumber
+
         return  ResponseEntity.status(HttpStatus.Ok).body(new ResponseUser());
     }
 
-    @PostMapping("/openChting")
+    //Open Chat Room
+    @PostMapping("/openChatting")
     public ResponseEntity openCheating(@RequestHeader("userToken") String userToken,@RequestBody int coin,@RequestBody int ticket){
         DecodeUserToken decodeUserToken = new DecodeUserToken();
         String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
@@ -215,6 +229,7 @@ public class UserController {
         //코인, 티켓관련해서 정의된것 못찾음 ㅠ
     }
 
+    //List of post that searched with hashtag
     @PostMapping("/getHashtag")
     public ResponseEntity getHashtag(@RequestHeader("usertoken") String userToken, @RequestBody String hashTagName){
         DecodeUserToken decodeUserToken = new DecodeUserToken();
