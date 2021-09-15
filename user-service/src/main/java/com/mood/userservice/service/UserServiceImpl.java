@@ -1,12 +1,7 @@
 package com.mood.userservice.service;
 import com.mood.userservice.dto.UserDto;
-import com.mood.userservice.jpa.UserDetailEntity;
-import com.mood.userservice.jpa.UserEntity;
-import com.mood.userservice.jpa.UserRepository;
+import com.mood.userservice.jpa.*;
 import lombok.extern.slf4j.Slf4j;
-import net.nurigo.java_sdk.api.Message;
-import net.nurigo.java_sdk.exceptions.CoolsmsException;
-import org.json.simple.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,28 +14,30 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.Year;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
+    UserDetailRepository userDetailRepository;
+    UserGradeRepository userGradeRepository;
     BCryptPasswordEncoder passwordEncoder;
     Environment env;
     CircuitBreakerFactory circuitBreakerFactory;
+    MessagingService messagingService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
-                           Environment env, CircuitBreakerFactory circuitBreakerFactory){
+    public UserServiceImpl(UserRepository userRepository, UserDetailRepository userDetailRepository, UserGradeRepository userGradeRepository, BCryptPasswordEncoder passwordEncoder,
+                           Environment env, CircuitBreakerFactory circuitBreakerFactory, MessagingService messagingService){
         this.userRepository = userRepository;
+        this.userDetailRepository= userDetailRepository;
+        this.userGradeRepository = userGradeRepository;
         this.passwordEncoder = passwordEncoder;
         this.env=env;
         this.circuitBreakerFactory = circuitBreakerFactory;
+        this.messagingService=messagingService;
     }
 
 
@@ -62,6 +59,7 @@ public class UserServiceImpl implements UserService {
         userDto.setRecentLoginTime(LocalDateTime.now());
         userDto.setGradeStart(LocalDateTime.now());
         userDto.setUserAge(updateUserAge(userDto));
+        userDto.setUserGrade(userGradeRepository.findByGradeType("newbie").getGradeUid());
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -88,57 +86,22 @@ public class UserServiceImpl implements UserService {
         if(userEntity.equals(null)) return false;
         return true;
     }
-
-    @Override
-    public void sendCreditNumber(String phoneNum) {
-        int randomNumber = createRandomNumber();
-        String message = "[Mood] 본인인증 번호는 ["+randomNumber+"] 입니다.";
-        sendMessage(message, phoneNum);
-        UserEntity userEntity = userRepository.findByPhoneNum(phoneNum);
-        userEntity.setCreditNumber(randomNumber);
-        userRepository.save(userEntity);
-    }
-    public int createRandomNumber(){
-        Random random = new Random();
-        int number = (random.nextInt(8888)+1111);
-        return number;
-    }
-
-    public void sendMessage(String message, String toNumber){
-        //Confirm the function, Environment wtf..
-        log.info("Before send message : "+LocalDateTime.now()+" = To : "+toNumber+" Message : "+message);
-
-        String apiKey=env.getProperty("messaging.apiKey");
-        String apiSecret=env.getProperty("messaging.apiSecret");
-        String fromNumber=env.getProperty("messaging.fromNumber");
-        log.info("Before send message : "+LocalDateTime.now()+" = From : "+fromNumber+" apiKey : "+apiKey+" apiSecret : "+apiSecret);
-
-        Message coolsms = new Message(apiKey, apiSecret);
-
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("to", toNumber);
-        params.put("from", fromNumber);
-        params.put("type", "SMS");
-        params.put("text", message);
-        params.put("app_version", "test app 0.5"); // application name and version
-
-        try {
-            JSONObject obj = (JSONObject) coolsms.send(params);
-            System.out.println(obj.toString());
-        } catch (CoolsmsException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getCode());
-        }
-        log.info("After send message");
-    }
-
-    public boolean updateMatchingUsers(UserDto userDto){
-
-        return false;
-    }
     public int updateUserAge(UserDto userDto){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime birthdate = LocalDateTime.parse(userDto.getBirthdate(),formatter);
         return LocalDateTime.now().getYear()-birthdate.getYear();
     }
+
+    @Override
+    public void sendCreditNumber(String phoneNum) {
+        int randomNumber = messagingService.createRandomNumber();
+        String message = "[Mood] 본인인증 번호는 ["+randomNumber+"] 입니다.";
+        messagingService.sendMessage(message, phoneNum);
+        UserEntity userEntity = userRepository.findByPhoneNum(phoneNum);
+        userEntity.setCreditNumber(randomNumber);
+        userRepository.save(userEntity);
+    }
+
+
+
 }

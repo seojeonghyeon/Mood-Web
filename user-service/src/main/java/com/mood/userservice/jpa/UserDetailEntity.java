@@ -17,31 +17,34 @@ public class UserDetailEntity {
     @Column(nullable = false, unique = true)
     private String userUid;
 
+    @Column(nullable = false, unique = true)
+    private String phoneNum;
+
     @Column(nullable = false)
     private boolean gender;
 
     @Column(nullable = false)
     @ColumnDefault("true")
-    private boolean other_M;
+    private boolean otherM;
 
     @Column(nullable = false)
     @ColumnDefault("true")
-    private boolean other_W;
+    private boolean otherW;
 
     @Column(nullable = false)
-    private int respect;
+    private double respect;
 
     @Column(nullable = false)
-    private int contact;
+    private double contact;
 
     @Column(nullable = false)
-    private int date;
+    private double date;
 
     @Column(nullable = false)
-    private int communication;
+    private double communication;
 
     @Column(nullable = false)
-    private int sex;
+    private double sex;
 
     @Column(nullable = false, length = 300)
     private String work;
@@ -72,7 +75,7 @@ public class UserDetailEntity {
 
     @Column(nullable = false)
     @ColumnDefault("newbie")
-    private int userGrade;
+    private String userGrade;
 
     @Column(nullable = false)
     private LocalDateTime gradeStart;
@@ -97,4 +100,7 @@ public class UserDetailEntity {
 
     @Column(nullable = false)
     private LocalDateTime recentLoginTime;
+
+    @Column(nullable = false)
+    private boolean disabled;
 }

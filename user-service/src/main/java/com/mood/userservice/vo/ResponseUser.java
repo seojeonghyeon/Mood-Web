@@ -21,11 +21,11 @@ public class ResponseUser {
     private boolean gender;
     private boolean other_M;
     private boolean other_W;
-    private int respect;
-    private int contact;
-    private int date;
-    private int communication;
-    private int sex;
+    private double respect;
+    private double contact;
+    private double date;
+    private double communication;
+    private double sex;
     private String work;
     private String happy;
     private String dating;

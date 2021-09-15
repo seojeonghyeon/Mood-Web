@@ -4,7 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="efc9baa0-36e8-4b6c-a741-42b817a45ce7" name="Default Changelist" comment="" />
+    <list default="true" id="efc9baa0-36e8-4b6c-a741-42b817a45ce7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/BlockUserEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/BlockUserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MatchingService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MatchingServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MessagingService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MessagingServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/clustering/UserGroupClustering.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/UserDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserDetailEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserDetailEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserDetailRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserDetailRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/ResponseUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/ResponseUser.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -29,6 +44,29 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="JpbToolWindowState">
+    <option name="myId2FirstActivated">
+      <map>
+        <entry key="JPA Inspector" value="true" />
+        <entry key="JPA Palette" value="true" />
+        <entry key="JPA Structure" value="true" />
+      </map>
+    </option>
+    <option name="myId2Visible">
+      <map>
+        <entry key="JPA Inspector" value="false" />
+        <entry key="JPA Palette" value="false" />
+        <entry key="JPA Structure" value="false" />
+      </map>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="Use Maven wrapper" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
   <component name="ProjectId" id="1xszLTc6F5gw2HwKGSOjcqxMWDH" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -51,6 +89,9 @@
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -103,7 +144,11 @@
       <workItem from="1631445965685" duration="2689000" />
       <workItem from="1631455152449" duration="1691000" />
       <workItem from="1631520905991" duration="8210000" />
-      <workItem from="1631598536567" duration="4912000" />
+      <workItem from="1631598536567" duration="4985000" />
+      <workItem from="1631605643640" duration="151000" />
+      <workItem from="1631605907573" duration="243000" />
+      <workItem from="1631607767827" duration="7732000" />
+      <workItem from="1631683660561" duration="12867000" />
     </task>
     <servers />
   </component>

@@ -3,11 +3,29 @@ package com.mood.userservice.jpa;
 import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface UserDetailRepository extends CrudRepository<UserDetailEntity, Long> {
     UserDetailEntity findByUserUid(String userUid);
-    UserDetailEntity findByUserAgeBetweenAndUserGroupAndGenderAndOther_MAndOther_WAndMaxDistanceAndRecentLoginTime(
-            int minAge, int maxAge, int userGroup, boolean gender, boolean other_M, boolean other_W, int maxDistance,
-            LocalDateTime recentLoginTime);
-    UserDetailEntity findAllByOther_MAndOther_WAndBetweenMinAgeAndMaxAge(boolean other_W, boolean other_m);
+    //Woman
+    List<UserDetailEntity> findTop20ByUserGroupAndGenderAndOtherWAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime(
+            int userGroup, boolean gender, boolean otherW, int maxDistance, String userGrade, boolean disabled, LocalDateTime recentLoginTime,
+            int minAge, int maxAge);
+    List<UserDetailEntity> findTop25ByUserGroupAndGenderAndOtherWAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime(
+            int userGroup, boolean gender, boolean otherW, int maxDistance, String userGrade,boolean disabled, LocalDateTime recentLoginTime,
+            int minAge, int maxAge);
+    List<UserDetailEntity> findTop30ByUserGroupAndGenderAndOtherWAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime(
+            int userGroup, boolean gender, boolean otherW, int maxDistance, String userGrade,boolean disabled,LocalDateTime recentLoginTime,
+            int minAge, int maxAge);
+
+    //Man
+    List<UserDetailEntity> findTop20ByUserGroupAndGenderAndOtherMAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime(
+            int userGroup, boolean gender, boolean otherW, int maxDistance, String userGrade,boolean disabled,LocalDateTime recentLoginTime,
+            int minAge, int maxAge);
+    List<UserDetailEntity> findTop25ByUserGroupAndGenderAndOtherMAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime(
+            int userGroup, boolean gender, boolean otherW, int maxDistance, String userGrade,boolean disabled,LocalDateTime recentLoginTime,
+            int minAge, int maxAge);
+    List<UserDetailEntity> findTop30ByUserGroupAndGenderAndOtherMAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime(
+            int userGroup, boolean gender, boolean otherW, int maxDistance, String userGrade,boolean disabled,LocalDateTime recentLoginTime,
+            int minAge, int maxAge);
 }

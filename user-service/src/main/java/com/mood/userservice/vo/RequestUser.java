@@ -45,23 +45,23 @@ public class RequestUser {
 
     @Min(value = 0, message = "Min Value is 0")
     @Max(value = 5, message = "Max value is 5")
-    private int respect;
+    private double respect;
 
     @Min(value = 0, message = "Min Value is 0")
     @Max(value = 5, message = "Max value is 5")
-    private int contact;
+    private double contact;
 
     @Min(value = 0, message = "Min Value is 0")
     @Max(value = 5, message = "Max value is 5")
-    private int date;
+    private double date;
 
     @Min(value = 0, message = "Min Value is 0")
     @Max(value = 5, message = "Max value is 5")
-    private int communication;
+    private double communication;
 
     @Min(value = 0, message = "Min Value is 0")
     @Max(value = 5, message = "Max value is 5")
-    private int sex;
+    private double sex;
 
     @Size(min = 1, message = "Answer must be equeal or grater than 1 characters")
     private String work;
