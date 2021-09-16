@@ -1,12 +1,9 @@
 package com.mood.userservice.vo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseMatchingUser {
+public class RequestMatchingUser {
     private String userUid;
 
     private String profileImage;

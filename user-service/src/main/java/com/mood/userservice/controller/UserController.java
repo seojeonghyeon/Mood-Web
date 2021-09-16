@@ -4,11 +4,13 @@ import com.mood.userservice.decode.DecodeUserToken;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.service.UserService;
 import com.mood.userservice.vo.RequestUser;
+import com.mood.userservice.vo.ResponseMatchingUser;
 import com.mood.userservice.vo.ResponseUser;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import io.jsonwebtoken.Jwts;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user-service")
@@ -26,9 +30,11 @@ public class UserController {
     private DecodeUserToken decodeUserToken;
 
     @Autowired
-    public UserController(Environment env, UserService userService){
+    public UserController(Environment env, UserService userService, DecodeUserToken decodeUserToken){
         this.env = env;
         this.userService = userService;
+        this.decodeUserToken = decodeUserToken;
+
     }
 
     //Back-end Server, User Service Health Check
@@ -69,7 +75,6 @@ public class UserController {
 
     @PostMapping("/resetPassword")
     public ResponseEntity resetPassword(@RequestHeader("userToken") String userToken,@RequestBody RequestUser requestUser){
-        DecodeUserToken decodeUserToken = new DecodeUserToken();
         String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
         if(userUid.equals(null)){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseUser());
@@ -114,4 +119,8 @@ public class UserController {
         userService.sendCreditNumber(requestUser.getPhoneNum());
         return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
     }
+//    @PostMapping("/updateMatchingUsers")
+//    public ResponseEntity updateMatchingUsers(@RequestBody RequestUser requestUser){
+//
+//    }
 }

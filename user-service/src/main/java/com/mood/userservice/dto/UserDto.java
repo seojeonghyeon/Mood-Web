@@ -29,15 +29,15 @@ public class UserDto {
     private boolean gender;
 
     //Matching gender is user's hope. User' hope is Man, then oter_m is true.
-    private boolean other_M;
-    private boolean other_W;
+    private boolean otherM;
+    private boolean otherW;
 
     //Question Value between 0 ~ 5
-    private int respect;
-    private int contact;
-    private int date;
-    private int communication;
-    private int sex;
+    private double respect;
+    private double contact;
+    private double date;
+    private double communication;
+    private double sex;
 
     //Question of String
     private String work;
@@ -53,7 +53,7 @@ public class UserDto {
     private double latitude;
     private double longitude;
 
-   //Sublocation Name, Eng for User's grade on VIP . Alert a Kor in need.
+    //Sublocation Name, Eng for User's grade on VIP . Alert a Kor in need.
     private String subLocation;
     private double subLatitude;
     private double subLongitude;

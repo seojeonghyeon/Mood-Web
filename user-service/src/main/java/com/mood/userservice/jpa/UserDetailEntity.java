@@ -22,11 +22,11 @@ public class UserDetailEntity {
 
     @Column(nullable = false)
     @ColumnDefault("true")
-    private boolean other_M;
+    private boolean otherM;
 
     @Column(nullable = false)
     @ColumnDefault("true")
-    private boolean other_W;
+    private boolean otherW;
 
     @Column(nullable = false)
     private int respect;
@@ -72,7 +72,7 @@ public class UserDetailEntity {
 
     @Column(nullable = false)
     @ColumnDefault("newbie")
-    private int userGrade;
+    private String userGrade;
 
     @Column(nullable = false)
     private LocalDateTime gradeStart;
@@ -97,4 +97,12 @@ public class UserDetailEntity {
 
     @Column(nullable = false)
     private LocalDateTime recentLoginTime;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean userLock;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean disabled;
 }
