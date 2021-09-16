@@ -2,6 +2,8 @@ package com.mood.userservice.controller;
 
 import com.mood.userservice.decode.DecodeUserToken;
 import com.mood.userservice.dto.UserDto;
+import com.mood.userservice.jpa.UserEntity;
+import com.mood.userservice.jpa.UserRepository;
 import com.mood.userservice.service.UserService;
 import com.mood.userservice.vo.*;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,6 +18,7 @@ import io.jsonwebtoken.Jwts;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user-service")
@@ -153,9 +156,17 @@ public class UserController {
     //Check Certification Number
     @PostMapping("/certificateNumber")
     public ResponseEntity certificateNumber(@RequestBody String numberId) {
+        //get number Id change Int
+        int number = Integer.parseInt(numberId);
+        UserEntity userEntity = new UserEntity();
+        if(number != userEntity.getCreditNumber()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        }
+        //Service. check DB
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
-    ;
+
 
     //For #Mood Function , User and OtherUser Profile Return to Front
     @PostMapping("/getUser")
@@ -163,10 +174,10 @@ public class UserController {
         DecodeUserToken decodeUserToken = new DecodeUserToken();
         String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
         if (userUid.equals(null)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseProfile());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestProfile());
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseProfile());
+        return ResponseEntity.status(HttpStatus.OK).body(new RequestProfile());
     }
     //If pay for Coin or VIP (Once a pay, Day) Give Coin
     @PostMapping("purchaseVIP")
@@ -176,6 +187,12 @@ public class UserController {
         if (userUid.equals(null)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         }
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        //service. get user orderId, packageName, productid, purchaseTime, purchaseState, purchaseToken, acknowledged
+        //when purchasing, give coin
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
 
     }
 
@@ -198,8 +215,18 @@ public class UserController {
 
     //BlockPhoneNumber
     @PostMapping("/blockPhoneNums")
-    public ResponseEntity blockPhoneNums(@RequestHeader("userToken") String userToken, @RequestBody) {
+    public ResponseEntity blockPhoneNums(@RequestHeader("userToken") String userToken, @RequestBody List<String> phoneNumList) {
+        DecodeUserToken decodeUserToken = new DecodeUserToken();
+        String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
+        if (userUid.equals(null)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        }
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        //service. get blockPhoneNumber
+        // Block PhoneNumber from DB
 
+        return  ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
     //Reset PhoneNumber (After sendCertification complete)
@@ -212,10 +239,11 @@ public class UserController {
         }
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        //service
         //Get. UserPhoneNumber -> After sendCertification
         //set. UserPhoneNumber
 
-        return  ResponseEntity.status(HttpStatus.Ok).body(new ResponseUser());
+        return  ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
     //Open Chat Room
@@ -226,7 +254,9 @@ public class UserController {
         if (userUid.equals(null)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         }
-        //코인, 티켓관련해서 정의된것 못찾음 ㅠ
+        //sevice. get coin, ticket (payment)
+        //open Chat Room
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
     //List of post that searched with hashtag
@@ -237,5 +267,12 @@ public class UserController {
         if (userUid.equals(null)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         }
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
+        //service.List of Post that searched with HashTagName
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 }

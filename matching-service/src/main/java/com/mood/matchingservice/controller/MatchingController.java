@@ -72,4 +72,21 @@ public class MatchingController {
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMatchingUser());
     }
+
+    //
+    @PostMapping("updateMatchingTime")
+    public ResponseEntity updateMatchingTime(@RequestHeader String userToken,@RequestBody String product){
+        DecodeUserToken decodeUserToken = new DecodeUserToken();
+        String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
+        if(userUid.equals(null)){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMatchingUser());
+        }
+        MatchingUserDto matchingUserDto = new MatchingUserDto();
+        matchingUserDto.setUserUid(userUid);
+        //Get Distinguish product (matching, profile, request, reset)
+        //service. Shorten MatchingTime (matching, profile, request)
+        //service. reset MatchingTime once a 6 month (reset)
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMatchingUser());
+    }
 }
