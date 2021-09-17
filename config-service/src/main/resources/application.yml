@@ -14,10 +14,61 @@ spring:
   cloud:
     config:
       server:
-        native:
-          search-locations: file://${user.home}/Documents/Work/native-file-repo
-#        git:
-#          uri: https://github.com/seojeonghyeon/spring-cloud-config.git
+        git:
+          uri: git@github.com:seojeonghyeon/Mood-Web.git
+          ignore-local-ssh-settings: true
+          private-key:
+            -----BEGIN RSA PRIVATE KEY-----
+            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
+            -----END RSA PRIVATE KEY-----
 
 management:
   endpoints:

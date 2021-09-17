@@ -3,13 +3,7 @@ server:
 
 spring:
   application:
-    name: user-service
-  h2:
-    console:
-      enabled: true
-      settings:
-        web-allow-others: true
-      path: /h2
+    name: lock-service
   h2:
     console:
       enabled: true
@@ -28,11 +22,9 @@ eureka:
 
 logging:
   level:
-    com.mood.userservice.client: DEBUG
+    com.mood.lockservice.client: DEBUG
 management:
   endpoints:
     web:
       exposure:
         include: info, refresh, health, metrics, prometheus
-
-

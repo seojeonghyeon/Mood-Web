@@ -14,8 +14,6 @@ import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -43,12 +41,15 @@ public class MatchingServiceImpl implements MatchingService{
 
     @Override
     public void updateMatchingUsers(UserDto userDto) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        UserDetailEntity updateUserDetailEntity = mapper.map(userDto, UserDetailEntity.class);
+
+        //Matching Users, 2
+        //Count percentage and get MatchingUsers
         Map<String, Integer> count = percentageCalculate(userDto);
         List<UserDetailEntity> matchingUsers = getMatchingUsers(userDto, count);
         List<RequestMatchingUser> matchingUserList = new ArrayList<RequestMatchingUser>();
-
-        ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         for(UserDetailEntity userDetailEntity : matchingUsers){
             UserEntity userEntity = userRepository.findByUserUid(userDetailEntity.getUserUid());
             RequestMatchingUser requestMatchingUser = mapper.map(userDetailEntity, RequestMatchingUser.class);
@@ -58,6 +59,8 @@ public class MatchingServiceImpl implements MatchingService{
                     userDetailEntity.getLatitude(), userDetailEntity.getLongitude()));
             requestMatchingUser.setNickname(userEntity.getNickname());
             MatchingData matchingData = new MatchingData();
+            matchingData.setMoodDistance(moodDistanceSearch(updateUserDetailEntity, userDetailEntity));
+            matchingData.setMatchingTime(LocalDateTime.now());
 
             requestMatchingUser.setMatchingData(matchingData);
             matchingUserList.add(requestMatchingUser);
@@ -200,8 +203,8 @@ public class MatchingServiceImpl implements MatchingService{
             unionY[i] = unions.get(i)[1];
         }
         double unionArea = polygonArea(unionX,unionY,unionX.length);
-        return intersectionArea/unionArea;
 
+        return intersectionArea/unionArea*100;
     }
 
     public double polygonArea(double[] X, double[] Y, int numPoints)
