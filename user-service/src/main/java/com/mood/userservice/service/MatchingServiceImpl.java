@@ -173,7 +173,7 @@ public class MatchingServiceImpl implements MatchingService{
             if(value1[i] > value2[i]){
                 intersections.add(userData1.get(i));
                 unions.add(userData2.get(i));
-            }else if(value1[i] > value2[i]){
+            }else if(value1[i] < value2[i]){
                 intersections.add(userData2.get(i));
                 unions.add(userData1.get(i));
             }else{
