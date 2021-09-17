@@ -55,7 +55,7 @@ public class MatchingServiceImpl implements MatchingService{
             requestMatchingUser.setProfileIcon(userEntity.getProfileImageIcon());
             requestMatchingUser.setProfileImage(userEntity.getProfileImage());
             requestMatchingUser.setPhysicalDistance(distance(userDto.getLatitude(),userDto.getLongitude(),
-                    userDetailEntity.getLatitude(), userDetailEntity.getLongitude(), "kilometer"));
+                    userDetailEntity.getLatitude(), userDetailEntity.getLongitude()));
             requestMatchingUser.setNickname(userEntity.getNickname());
             MatchingData matchingData = new MatchingData();
 
@@ -152,59 +152,99 @@ public class MatchingServiceImpl implements MatchingService{
     }
 
     public double moodDistanceSearch(UserDetailEntity userDetailEntity1, UserDetailEntity userDetailEntity2){
-        int area = 0;
-        double[][] userData1 =
-                {
-                        {userDetailEntity1.getRespect()*Math.cos(18), userDetailEntity1.getRespect()*Math.sin(18)},
-                        {userDetailEntity1.getContact()*Math.cos(90), userDetailEntity1.getContact()*Math.sin(90)},
-                        {userDetailEntity1.getDate()*Math.cos(168), userDetailEntity1.getDate()*Math.sin(168)},
-                        {userDetailEntity1.getCommunication()*Math.cos(234), userDetailEntity1.getCommunication()*Math.sin(234)},
-                        {userDetailEntity1.getSex()*Math.cos(306), userDetailEntity1.getSex()*Math.sin(306)}
-                };
-        double[][] userData2 =
-                {
-                        {userDetailEntity1.getRespect()*Math.cos(18), userDetailEntity1.getRespect()*Math.sin(18)},
-                        {userDetailEntity1.getContact()*Math.cos(90), userDetailEntity1.getContact()*Math.sin(90)},
-                        {userDetailEntity1.getDate()*Math.cos(168), userDetailEntity1.getDate()*Math.sin(168)},
-                        {userDetailEntity1.getCommunication()*Math.cos(234), userDetailEntity1.getCommunication()*Math.sin(234)},
-                        {userDetailEntity1.getSex()*Math.cos(306), userDetailEntity1.getSex()*Math.sin(306)}
-                };
+        int[] degreeArray = new int[] {18, 90, 162, 234, 306, 18};
+        int[] value1 = new int[]{userDetailEntity1.getRespect(), userDetailEntity1.getContact(),
+                userDetailEntity1.getDate(), userDetailEntity1.getCommunication(), userDetailEntity1.getSex()};
+        int[] value2 = new int[]{userDetailEntity2.getRespect(), userDetailEntity2.getContact(),
+                userDetailEntity2.getDate(), userDetailEntity2.getCommunication(), userDetailEntity2.getSex()};
+        ArrayList<double[]> userData1 = new ArrayList<double[]>();
+        ArrayList<double[]> userData2 = new ArrayList<double[]>();
+        ArrayList<double[]> intersections = new ArrayList<double[]>();
+        ArrayList<double[]> unions = new ArrayList<double[]>();
+        for(int i=0; i < degreeArray.length-1; i++){
+            userData1.add(new double[]{value1[i]*Math.cos(deg2rad(degreeArray[i])), value1[i]*Math.sin(deg2rad(degreeArray[i]))});
+            userData2.add(new double[]{value2[i]*Math.cos(deg2rad(degreeArray[i])), value2[i]*Math.sin(deg2rad(degreeArray[i]))});
+        }
 
-        return 0.0;
+        for(int i = 0; i < degreeArray.length-1; i++){
+            if(value1[i] > value2[i]){
+                intersections.add(userData1.get(i));
+                unions.add(userData2.get(i));
+            }else if(value1[i] > value2[i]){
+                intersections.add(userData2.get(i));
+                unions.add(userData1.get(i));
+            }else{
+                intersections.add(userData2.get(i));
+                unions.add(userData1.get(i));
+            }
+            double[] resultIntersection = intersection(userData1.get(i)[0], userData1.get(i)[1], userData1.get(i)[1], userData1.get(i)[1],
+                    userData2.get(i)[0], userData2.get(i)[0], userData2.get(i)[1], userData2.get(i)[1],
+                    degreeArray[i], degreeArray[i+1]);
+            if(resultIntersection[0]!=0 && resultIntersection[1]!=0){
+                intersections.add(resultIntersection);
+                unions.add(resultIntersection);
+            }
+        }
 
-
+        double [] intersectionsX = new double[intersections.size()];
+        double [] intersectionsY = new double[intersections.size()];
+        for (int i=0; i < intersections.size(); i++){
+            intersectionsX[i] = intersections.get(i)[0];
+            intersectionsY[i] = intersections.get(i)[1];
+        }
+        double intersectionArea = polygonArea(intersectionsX, intersectionsY, intersectionsX.length);
+        double [] unionX = new double[unions.size()];
+        double [] unionY = new double[unions.size()];
+        for (int i=0; i < unions.size(); i++){
+            unionX[i] = unions.get(i)[0];
+            unionY[i] = unions.get(i)[1];
+        }
+        double unionArea = polygonArea(unionX,unionY,unionX.length);
+        return intersectionArea/unionArea;
 
     }
 
-    public void intersection(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
-        int px= (x1*y2 - y1*x2)*(x3-x4) - (x1-x2)*(x3*y4 - y3*x4);
-        int py= (x1*y2 - y1*x2)*(y3-y4) - (y1-y2)*(x3*y4 - y3*x4);
-        int p = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
+    public double polygonArea(double[] X, double[] Y, int numPoints)
+    {
+        int area = 0;   // Accumulates area
+        int j = numPoints-1;
 
+        for (int i=0; i < numPoints; i++)
+        { area +=  (X[j]+X[i]) * (Y[j]-Y[i]);
+            j = i;  //j is previous vertex to i
+        }
+        return area/2;
+    }
+
+    public double[] intersection(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, int degree1, int degree2) {
+
+        int[] degreeArray = new int[] {18, 90, 162, 234, 306, 18};
+        double px= (x1*y2 - y1*x2)*(x3-x4) - (x1-x2)*(x3*y4 - y3*x4);
+        double py= (x1*y2 - y1*x2)*(y3-y4) - (y1-y2)*(x3*y4 - y3*x4);
+        double p = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
         if(p == 0) {
             System.out.println("parallel");
-            return;
+            return new double[]{0 ,0};
         }
+        double x = px/p;
+        double y = py/p;
 
-        int x = px/p;
-        int y = py/p;
-        System.out.println(x + ", " + y);
+        for(int i=0; i < degreeArray.length-1; i++){
+            if(-5 <= x && x <=-5 && -5 <= y && y <= 5){
+                if((Math.tan(deg2rad(degreeArray[i])*x) < y) && (y < Math.tan(deg2rad(deg2rad(degreeArray[i+1])*x)))){
+                    log.info("Intersection : X = "+x+" Y="+y);
+                    return new double[]{x, y};
+                }
+            }
+        }
+        return new double[]{0 ,0};
     }
 
     //two point distance
-    public double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
-        double theta = lon1 - lon2;
-        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1))
-                * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
-        dist = Math.acos(dist);
-        dist = rad2deg(dist);
-        dist = dist * 60 * 1.1515;
-        if (unit == "kilometer")
-            dist = dist * 1.609344;
-        else if(unit == "meter")
-            dist = dist * 1609.344;
-        return (dist);
+    public double distance(double lat1, double lon1, double lat2, double lon2) {
+        return 6371*Math.acos(Math.cos(deg2rad(lat1))*Math.cos(deg2rad(lat2))*Math.cos(deg2rad(lon2-lon1))+Math.sin(deg2rad(lat1))*Math.sin(deg2rad(lat2)));
     }
+
     // This function converts decimal degrees to radians
     private static double deg2rad(double deg) {
         return (deg * Math.PI / 180.0);
