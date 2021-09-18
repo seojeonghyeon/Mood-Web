@@ -42,15 +42,12 @@ public class UserEntity {
     private String profileImageIcon;
 
     @Column(nullable = false)
-    @ColumnDefault("0")
     private int coin;
 
     @Column(nullable = false)
-    @ColumnDefault("0")
     private int ticket;
 
     @Column(nullable = false)
-    @ColumnDefault("0")
     private int loginCount;
 
     @Column(nullable = false)
@@ -66,7 +63,6 @@ public class UserEntity {
     private LocalDateTime nextMatchingTime;
 
     @Column(nullable = false)
-    @ColumnDefault("true")
     private boolean resetMatching;
 
     @Column(nullable = true)
@@ -76,13 +72,11 @@ public class UserEntity {
     private boolean creditEnabled;
 
     @Column(nullable = false)
-    @ColumnDefault("false")
     private boolean userLock;
 
     @Column(nullable = true)
     private int creditNumber;
 
     @Column(nullable = false)
-    @ColumnDefault("false")
     private boolean disabled;
 }

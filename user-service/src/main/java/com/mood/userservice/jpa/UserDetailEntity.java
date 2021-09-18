@@ -14,7 +14,7 @@ public class UserDetailEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String userUid;
 
     @Column(nullable = false)
@@ -71,7 +71,6 @@ public class UserDetailEntity {
     private double subLongitude;
 
     @Column(nullable = false)
-    @ColumnDefault("newbie")
     private String userGrade;
 
     @Column(nullable = false)
@@ -99,10 +98,8 @@ public class UserDetailEntity {
     private LocalDateTime recentLoginTime;
 
     @Column(nullable = false)
-    @ColumnDefault("false")
     private boolean userLock;
 
     @Column(nullable = false)
-    @ColumnDefault("false")
     private boolean disabled;
 }

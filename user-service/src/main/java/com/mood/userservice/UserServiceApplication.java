@@ -24,4 +24,5 @@ public class UserServiceApplication {
     public Logger.Level feignLoggerLevel(){
         return Logger.Level.FULL;
     }
+
 }
