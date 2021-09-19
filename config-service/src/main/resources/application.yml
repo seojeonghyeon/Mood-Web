@@ -4,74 +4,15 @@ server:
 spring:
   application:
     name: config-service
-  rabbitmq:
-    host: 127.0.0.1
-    port: 5672
-    username: guest
-    password: guest
-#  profiles:
-#    active: dev
+  profiles:
+    active: dev
   cloud:
     config:
       server:
         git:
-          uri: git@github.com:seojeonghyeon/mood-cloud-config.git
-          ignore-local-ssh-settings: true
-          private-key: |
-            -----BEGIN RSA PRIVATE KEY-----
-            Proc-Type: 4,ENCRYPTED
-            DEK-Info: AES-128-CBC,C0215967548D030F0A34DDBAEB0FBE1C
-
-            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
-            -----END RSA PRIVATE KEY-----
+          uri: https://github.com/seojeonghyeon/mood-cloud-config.git
+          username: seojeonghyeon
+          password: '{cipher}7f670856f84e128bf371ea2e48d26658fad70a56a67324a674baeb97f9e2693ad4b371a11e0f5d0c73ca051ae2b4352e9f3ccd5b6da84f3e8fe782cb0ff2cc86'
 management:
   endpoints:
     web:

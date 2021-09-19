@@ -1,5 +1,2 @@
-#encrypt:
-#  key-store:
-#    location: file://${user.home}/Documents/Work/keystore/apiEncryptionKey.jks
-#    password: test1234
-#    alias: apiEncryptionKey
+encrypt:
+  key: The9Beginning5Is0Small6But3The0EndWillBeGreat

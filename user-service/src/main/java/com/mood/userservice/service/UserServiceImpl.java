@@ -67,7 +67,22 @@ public class UserServiceImpl implements UserService {
         userDto.setRecentLoginTime(LocalDateTime.now());
         userDto.setGradeStart(LocalDateTime.now());
         userDto.setUserAge(updateUserAge(userDto));
+
+        //check circle grade
         userDto.setUserGrade(userGradeRepository.findByGradeType("newbie").getGradeUid());
+        userDto.setGradeStart(LocalDateTime.now());
+        userDto.setGradeEnd(LocalDateTime.now().plusDays(14));
+
+        userDto.setCoin(0);
+        userDto.setTicket(0);
+        userDto.setDisabled(false);
+        userDto.setUserLock(false);
+        userDto.setCreditEnabled(false);
+        userDto.setResetMatching(true);
+        //set UserGroup
+        //set Matching User
+        //update matching info
+
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);

@@ -11,6 +11,7 @@ import java.util.List;
 public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Long> {
     UserDetailEntity findByUserUid(String userUid);
     int countByUserGroupAndUserGradeAndDisabled(int userGroup, String userGrade, boolean disabled);
+    int countByUserGroupAndDisabled(int userGroup, boolean disabled);
 
     //Matching for Man
     @Query(

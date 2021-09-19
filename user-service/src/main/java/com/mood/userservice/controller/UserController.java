@@ -43,13 +43,6 @@ public class UserController {
                 +", token expiration time=" + env.getProperty("token.expiration_time"));
     }
 
-    @PostMapping("/testURL")
-    public String statusRestfulAPI(HttpServletRequest request, HttpServletResponse response){
-        String result = "userToken : "+request.getHeader("userToken")+" Request : ";
-        result+=request;
-        return result;
-    }
-
     @PostMapping("/regist")
     public ResponseEntity createUser(@RequestBody RequestUser user, HttpServletResponse response){
         ModelMapper mapper = new ModelMapper();
@@ -65,7 +58,6 @@ public class UserController {
                 .signWith(SignatureAlgorithm.HS512, env.getProperty("token.secret"))
                 .compact();
         response.addHeader("userToken", token);
-
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
