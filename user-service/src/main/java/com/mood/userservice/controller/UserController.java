@@ -2,6 +2,7 @@ package com.mood.userservice.controller;
 
 import com.mood.userservice.decode.DecodeUserToken;
 import com.mood.userservice.dto.UserDto;
+import com.mood.userservice.service.MatchingService;
 import com.mood.userservice.service.UserService;
 import com.mood.userservice.vo.RequestUser;
 import com.mood.userservice.vo.ResponseUser;
@@ -25,12 +26,14 @@ import java.util.List;
 public class UserController {
     private Environment env;
     private UserService userService;
+    private MatchingService matchingService;
 
 
     @Autowired
-    public UserController(Environment env, UserService userService){
+    public UserController(Environment env, UserService userService, MatchingService matchingService){
         this.env = env;
         this.userService = userService;
+        this.matchingService = matchingService;
     }
 
     //Back-end Server, User Service Health Check
@@ -48,10 +51,8 @@ public class UserController {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(user, UserDto.class);
-        userService.createUser(userDto);
-
-        //function, Matching Users
-
+        userDto = userService.createUser(userDto);
+        matchingService.updateMatchingUsers(userDto);
         String token = Jwts.builder()
                 .setSubject(userDto.getUserUid())
                 .setExpiration(new Date(System.currentTimeMillis()+Long.parseLong(env.getProperty("token.expiration_time"))))

@@ -71,8 +71,8 @@ public class UserDto {
     //For matching, max distance is hoped matching.
     private int maxDistance;
 
-    //Clustering, user group.
-    private int userGroup;
+    //Classification, user group.
+    private double userGroup;
 
     //pay Crash
     private int coin;

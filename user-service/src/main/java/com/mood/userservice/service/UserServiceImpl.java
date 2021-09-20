@@ -1,6 +1,7 @@
 package com.mood.userservice.service;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.jpa.*;
+import com.mood.userservice.service.classification.UserGroup;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
@@ -34,11 +35,13 @@ public class UserServiceImpl implements UserService {
     MessageService messageService;
     UserGradeRepository userGradeRepository;
     UserDetailRepository userDetailRepository;
+    TotalUserRepository totalUserRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
                            Environment env, CircuitBreakerFactory circuitBreakerFactory, MessageService messageService,
-                           UserGradeRepository userGradeRepository, UserDetailRepository userDetailRepository){
+                           UserGradeRepository userGradeRepository, UserDetailRepository userDetailRepository,
+                           TotalUserRepository totalUserRepository){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.env=env;
@@ -46,6 +49,7 @@ public class UserServiceImpl implements UserService {
         this.messageService=messageService;
         this.userGradeRepository=userGradeRepository;
         this.userDetailRepository=userDetailRepository;
+        this.totalUserRepository=totalUserRepository;
     }
 
 
@@ -61,6 +65,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         log.info("Before create User : "+LocalDateTime.now() + " = "+userDto.getUserUid());
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         userDto.setUserUid(UUID.randomUUID().toString());
         userDto.setCreateTimeAt(LocalDateTime.now());
@@ -79,13 +85,10 @@ public class UserServiceImpl implements UserService {
         userDto.setUserLock(false);
         userDto.setCreditEnabled(false);
         userDto.setResetMatching(true);
+
         //set UserGroup
-        //set Matching User
-        //update matching info
-
-
-        ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        UserGroup userGroup = new UserGroup(userDetailRepository, totalUserRepository);
+        userDto.setUserGroup(userGroup.selectDecisionTree(userDto));
         UserEntity userEntity = mapper.map(userDto, UserEntity.class);
         UserDetailEntity userDetailEntity = mapper.map(userDto, UserDetailEntity.class);
 

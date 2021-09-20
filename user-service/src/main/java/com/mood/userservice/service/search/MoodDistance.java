@@ -1,5 +1,6 @@
 package com.mood.userservice.service.search;
 
+import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.jpa.UserDetailEntity;
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,12 +8,12 @@ import java.util.ArrayList;
 
 @Slf4j
 public class MoodDistance {
-    public double search(UserDetailEntity userDetailEntity1, UserDetailEntity userDetailEntity2){
+    public double search(UserDto userDto1, UserDto userDto2){
         int[] degreeArray = new int[] {18, 90, 162, 234, 306, 18};
-        int[] value1 = new int[]{userDetailEntity1.getRespect(), userDetailEntity1.getContact(),
-                userDetailEntity1.getDate(), userDetailEntity1.getCommunication(), userDetailEntity1.getSex()};
-        int[] value2 = new int[]{userDetailEntity2.getRespect(), userDetailEntity2.getContact(),
-                userDetailEntity2.getDate(), userDetailEntity2.getCommunication(), userDetailEntity2.getSex()};
+        double[] value1 = new double[]{userDto1.getRespect(), userDto1.getContact(),
+                userDto1.getDate(), userDto1.getCommunication(), userDto1.getSex()};
+        double[] value2 = new double[]{userDto2.getRespect(), userDto2.getContact(),
+                userDto2.getDate(), userDto2.getCommunication(), userDto2.getSex()};
         ArrayList<double[]> userData1 = new ArrayList<double[]>();
         ArrayList<double[]> userData2 = new ArrayList<double[]>();
         ArrayList<double[]> intersections = new ArrayList<double[]>();
@@ -58,6 +59,16 @@ public class MoodDistance {
         double unionArea = polygonArea(unionX,unionY,unionX.length);
 
         return intersectionArea/unionArea*100;
+    }
+
+    public double findUserMoodDistanceOnTotal(UserDto userDto){
+        UserDto total = new UserDto();
+        total.setCommunication(5);
+        total.setContact(5);
+        total.setDate(5);
+        total.setRespect(5);
+        total.setSex(5);
+        return search(userDto, total);
     }
 
     public double polygonArea(double[] X, double[] Y, int numPoints)

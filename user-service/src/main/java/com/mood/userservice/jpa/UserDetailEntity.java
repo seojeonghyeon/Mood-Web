@@ -29,19 +29,19 @@ public class UserDetailEntity {
     private boolean otherW;
 
     @Column(nullable = false)
-    private int respect;
+    private double respect;
 
     @Column(nullable = false)
-    private int contact;
+    private double contact;
 
     @Column(nullable = false)
-    private int date;
+    private double date;
 
     @Column(nullable = false)
-    private int communication;
+    private double communication;
 
     @Column(nullable = false)
-    private int sex;
+    private double sex;
 
     @Column(nullable = false, length = 300)
     private String work;
@@ -92,7 +92,7 @@ public class UserDetailEntity {
     private int maxDistance;
 
     @Column(nullable = true)
-    private int userGroup;
+    private double userGroup;
 
     @Column(nullable = false)
     private LocalDateTime recentLoginTime;

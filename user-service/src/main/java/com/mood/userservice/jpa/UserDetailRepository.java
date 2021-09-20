@@ -12,6 +12,7 @@ public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Lo
     UserDetailEntity findByUserUid(String userUid);
     int countByUserGroupAndUserGradeAndDisabled(int userGroup, String userGrade, boolean disabled);
     int countByUserGroupAndDisabled(int userGroup, boolean disabled);
+    int countByDisabled(boolean disabled);
 
     //Matching for Man
     @Query(

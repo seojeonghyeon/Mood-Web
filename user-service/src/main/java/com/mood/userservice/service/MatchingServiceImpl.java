@@ -62,8 +62,10 @@ public class MatchingServiceImpl implements MatchingService{
             requestMatchingUser.setPhysicalDistance(distance(userDto.getLatitude(),userDto.getLongitude(),
                     userDetailEntity.getLatitude(), userDetailEntity.getLongitude()));
             requestMatchingUser.setNickname(userEntity.getNickname());
+
+            UserDto mathcingUserDto = mapper.map(requestMatchingUser, UserDto.class);
             MatchingData matchingData = new MatchingData();
-            matchingData.setMoodDistance(moodDistance.search(updateUserDetailEntity, userDetailEntity));
+            matchingData.setMoodDistance(moodDistance.search(userDto, mathcingUserDto));
             matchingData.setMatchingTime(LocalDateTime.now());
 
             requestMatchingUser.setMatchingData(matchingData);
