@@ -106,4 +106,6 @@ public class RequestUser {
     @Min(value = 10, message = "Min Age is 20")
     @Max(value = 90, message = "Max Age is 90")
     private int maxDistance;
+
+    private String hashkey;
 }

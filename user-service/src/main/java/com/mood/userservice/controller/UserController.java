@@ -106,7 +106,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         if(!userService.checkUserPhoneNumber(userDto))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseUser());
-        userService.sendCreditNumber(requestUser.getPhoneNum());
+        userService.sendCreditNumber(requestUser.getPhoneNum(), requestUser.getHashkey());
         return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
     }
 

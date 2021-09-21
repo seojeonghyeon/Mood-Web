@@ -9,6 +9,6 @@ public interface UserService extends UserDetailsService {
     boolean checkUserPhoneNumber(UserDto userDto);
     String getEmailByPhoneNum(UserDto userDto);
     boolean getCertification(UserDto userDto);
-    void sendCreditNumber(String phoneNum);
+    void sendCreditNumber(String phoneNum, String hashkey);
     boolean resetPassword(UserDto userDto);
 }

@@ -3,27 +3,24 @@ package com.mood.userservice.jpa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.Nullable;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Long> {
-    @Nullable
     UserDetailEntity findByUserUid(String userUid);
 
-    @Nullable
     int countByUserGroupAndUserGradeAndDisabled(double userGroup, String userGrade, boolean disabled);
 
-    @Nullable
     int countByUserGroupAndDisabled(int userGroup, boolean disabled);
 
-    @Nullable
     int countByDisabled(boolean disabled);
 
     //Matching for Man
-    @Nullable
     @Query(
             value = "SELECT DISTINCT * "+
             "FROM userdetails " +
@@ -45,7 +42,6 @@ public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Lo
     );
 
     //Matching for Woman
-    @Nullable
     @Query(
             value = "SELECT DISTINCT * "+
                     "FROM userdetails " +

@@ -21,10 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -96,69 +93,87 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByEmail(username);
-        if(userEntity == null)
+        Optional<UserEntity> optional = userRepository.findByEmail(username);
+        if(optional.isPresent()) {
+            UserEntity userEntity = optional.get();
+            return new User(userEntity.getEmail(), userEntity.getEncryptedPwd(), true, true, true, true,
+                    new ArrayList<>());
+        } else {
             throw new UsernameNotFoundException(username);
-        return new User(userEntity.getEmail(), userEntity.getEncryptedPwd(), true, true, true, true,
-                new ArrayList<>());
+        }
     }
 
     @Override
     public UserDto getUserDetailsByEmail(String email) {
-        UserEntity userEntity = userRepository.findByEmail(email);
-        if(userEntity==null)
+        Optional<UserEntity> optional = userRepository.findByEmail(email);
+        if(optional.isPresent()) {
+            UserEntity userEntity = optional.get();
+            UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
+            return userDto;
+        } else {
             throw new UsernameNotFoundException(email);
-        UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
-
-        return userDto;
+        }
     }
 
     @Override
     public boolean checkUserPhoneNumber(UserDto userDto) {
-        UserEntity userEntity = userRepository.findByPhoneNum(userDto.getPhoneNum());
-        if(userEntity.equals(null)) return false;
-        return true;
+        Optional<UserEntity> optional = userRepository.findByPhoneNum(userDto.getPhoneNum());
+        if(optional.isPresent()) return true;
+        else return false;
     }
 
     @Override
     public String getEmailByPhoneNum(UserDto userDto) {
-        UserEntity userEntity = userRepository.findByCreditEnabledAndPhoneNum(true, userDto.getPhoneNum());
-        return userEntity.getEmail();
+        Optional<UserEntity> optional = userRepository.findByCreditEnabledAndPhoneNum(true, userDto.getPhoneNum());
+        if(optional.isPresent()) {
+            UserEntity userEntity = optional.get();
+            return userEntity.getEmail();
+        } else {
+            return "";
+        }
     }
 
     @Override
     public boolean getCertification(UserDto userDto) {
-        return userRepository.findByPhoneNum(userDto.getPhoneNum()).isCreditEnabled();
+        Optional<UserEntity> optional = userRepository.findByPhoneNum(userDto.getPhoneNum());
+        if(optional.isPresent()) {
+            UserEntity userEntity = optional.get();
+            return userEntity.isCreditEnabled();
+        } else {
+            return false;
+        }
     }
 
     @Override
-    public void sendCreditNumber(String phoneNum) {
+    public void sendCreditNumber(String phoneNum, String hashkey) {
         int randomNumber = messageService.createRandomNumber();
-        String message = "[Mood] 본인인증 번호는 ["+randomNumber+"] 입니다.";
+        String message = " <#> [Mood] 본인인증 번호는 ["+randomNumber+"] 입니다. "+hashkey+"  ";
         messageService.sendMessage(message, phoneNum);
-        UserEntity userEntity = userRepository.findByPhoneNum(phoneNum);
-        userEntity.setCreditNumber(randomNumber);
-        userRepository.save(userEntity);
+        Optional<UserEntity> optional = userRepository.findByPhoneNum(phoneNum);
+        if(optional.isPresent()) {
+            UserEntity userEntity = optional.get();
+            userEntity.setCreditNumber(randomNumber);
+            userRepository.save(userEntity);
+        }
     }
 
     @Override
     public boolean resetPassword(UserDto userDto) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        UserEntity getUserEntity = userRepository.findByUserUid(userDto.getUserUid());
-        UserDto getUserDto = modelMapper.map(getUserEntity, UserDto.class);
-        if (userDto.getEmail().equals(getUserDto.getEmail()) && userDto.getPhoneNum().equals(getUserDto.getPhoneNum())) {
-            getUserEntity.setEncryptedPwd(passwordEncoder.encode(userDto.getPassword()));
-            userRepository.save(getUserEntity);
-            return true;
+        Optional<UserEntity> optional = userRepository.findByUserUid(userDto.getUserUid());
+        if(optional.isPresent()) {
+            UserEntity getUserEntity = optional.get();
+            UserDto getUserDto = modelMapper.map(getUserEntity, UserDto.class);
+            if (userDto.getEmail().equals(getUserDto.getEmail()) && userDto.getPhoneNum().equals(getUserDto.getPhoneNum())) {
+                getUserEntity.setEncryptedPwd(passwordEncoder.encode(userDto.getPassword()));
+                userRepository.save(getUserEntity);
+                return true;
+            }
         }
         return false;
     }
 
-    public boolean updateMatchingUsers(UserDto userDto){
-
-        return false;
-    }
     public int updateUserAge(UserDto userDto){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate birthdate = LocalDate.parse(userDto.getBirthdate(),formatter);

@@ -55,21 +55,24 @@ public class MatchingServiceImpl implements MatchingService{
         List<UserDetailEntity> matchingUsers = matchingUser.getMatchingUsers(userDto, count);
         List<RequestMatchingUser> matchingUserList = new ArrayList<RequestMatchingUser>();
         for(UserDetailEntity userDetailEntity : matchingUsers){
-            UserEntity userEntity = userRepository.findByUserUid(userDetailEntity.getUserUid());
-            RequestMatchingUser requestMatchingUser = mapper.map(userDetailEntity, RequestMatchingUser.class);
-            requestMatchingUser.setProfileIcon(userEntity.getProfileImageIcon());
-            requestMatchingUser.setProfileImage(userEntity.getProfileImage());
-            requestMatchingUser.setPhysicalDistance(distance(userDto.getLatitude(),userDto.getLongitude(),
-                    userDetailEntity.getLatitude(), userDetailEntity.getLongitude()));
-            requestMatchingUser.setNickname(userEntity.getNickname());
+            Optional<UserEntity> optional = userRepository.findByUserUid(userDetailEntity.getUserUid());
+            if(optional.isPresent()) {
+                UserEntity userEntity = optional.get();
+                RequestMatchingUser requestMatchingUser = mapper.map(userDetailEntity, RequestMatchingUser.class);
+                requestMatchingUser.setProfileIcon(userEntity.getProfileImageIcon());
+                requestMatchingUser.setProfileImage(userEntity.getProfileImage());
+                requestMatchingUser.setPhysicalDistance(distance(userDto.getLatitude(), userDto.getLongitude(),
+                        userDetailEntity.getLatitude(), userDetailEntity.getLongitude()));
+                requestMatchingUser.setNickname(userEntity.getNickname());
 
-            UserDto mathcingUserDto = mapper.map(requestMatchingUser, UserDto.class);
-            MatchingData matchingData = new MatchingData();
-            matchingData.setMoodDistance(moodDistance.search(userDto, mathcingUserDto));
-            matchingData.setMatchingTime(LocalDateTime.now());
+                UserDto mathcingUserDto = mapper.map(requestMatchingUser, UserDto.class);
+                MatchingData matchingData = new MatchingData();
+                matchingData.setMoodDistance(moodDistance.search(userDto, mathcingUserDto));
+                matchingData.setMatchingTime(LocalDateTime.now());
 
-            requestMatchingUser.setMatchingData(matchingData);
-            matchingUserList.add(requestMatchingUser);
+                requestMatchingUser.setMatchingData(matchingData);
+                matchingUserList.add(requestMatchingUser);
+            }
         }
 
         log.info("Before call matching microservice");
