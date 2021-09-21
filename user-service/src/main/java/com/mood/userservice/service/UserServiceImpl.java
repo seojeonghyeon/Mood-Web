@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
@@ -52,19 +53,9 @@ public class UserServiceImpl implements UserService {
         this.totalUserRepository=totalUserRepository;
     }
 
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByEmail(username);
-        if(userEntity == null)
-            throw new UsernameNotFoundException(username);
-        return new User(userEntity.getEmail(), userEntity.getEncryptedPwd(), true, true, true, true,
-                new ArrayList<>());
-    }
-
     @Override
     public UserDto createUser(UserDto userDto) {
-        log.info("Before create User : "+LocalDateTime.now() + " = "+userDto.getUserUid());
+        log.info("Before create User : "+LocalDateTime.now() + " = "+userDto);
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
@@ -85,15 +76,16 @@ public class UserServiceImpl implements UserService {
         userDto.setUserLock(false);
         userDto.setCreditEnabled(false);
         userDto.setResetMatching(true);
-
+        log.info("other M : "+userDto.isOtherM()+"  other W : "+userDto.isOtherM());
         //set UserGroup
         UserGroup userGroup = new UserGroup(userDetailRepository, totalUserRepository);
         userDto.setUserGroup(userGroup.selectDecisionTree(userDto));
         UserEntity userEntity = mapper.map(userDto, UserEntity.class);
         UserDetailEntity userDetailEntity = mapper.map(userDto, UserDetailEntity.class);
-
+        log.info("other M : "+userDetailEntity.isOtherM()+"  other W : "+userDetailEntity.isOtherM());
         userEntity.setEncryptedPwd(passwordEncoder.encode(userDto.getPassword()));
-
+        userDetailEntity.setOtherM(userDto.isOtherM());
+        userDetailEntity.setOtherW(userDto.isOtherW());
         userRepository.save(userEntity);
         userDetailRepository.save(userDetailEntity);
         UserDto returnUserDto = mapper.map(userEntity, UserDto.class);
@@ -103,15 +95,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserDetailsByEmail(String userName) {
-        return null;
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByEmail(username);
+        if(userEntity == null)
+            throw new UsernameNotFoundException(username);
+        return new User(userEntity.getEmail(), userEntity.getEncryptedPwd(), true, true, true, true,
+                new ArrayList<>());
     }
 
     @Override
-    public boolean getUserPhoneNumber(String phoneNum) {
-        UserEntity userEntity = userRepository.findByPhoneNum(phoneNum);
+    public UserDto getUserDetailsByEmail(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email);
+        if(userEntity==null)
+            throw new UsernameNotFoundException(email);
+        UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
+
+        return userDto;
+    }
+
+    @Override
+    public boolean checkUserPhoneNumber(UserDto userDto) {
+        UserEntity userEntity = userRepository.findByPhoneNum(userDto.getPhoneNum());
         if(userEntity.equals(null)) return false;
         return true;
+    }
+
+    @Override
+    public String getEmailByPhoneNum(UserDto userDto) {
+        UserEntity userEntity = userRepository.findByCreditEnabledAndPhoneNum(true, userDto.getPhoneNum());
+        return userEntity.getEmail();
+    }
+
+    @Override
+    public boolean getCertification(UserDto userDto) {
+        return userRepository.findByPhoneNum(userDto.getPhoneNum()).isCreditEnabled();
     }
 
     @Override
@@ -124,13 +141,27 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userEntity);
     }
 
+    @Override
+    public boolean resetPassword(UserDto userDto) {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        UserEntity getUserEntity = userRepository.findByUserUid(userDto.getUserUid());
+        UserDto getUserDto = modelMapper.map(getUserEntity, UserDto.class);
+        if (userDto.getEmail().equals(getUserDto.getEmail()) && userDto.getPhoneNum().equals(getUserDto.getPhoneNum())) {
+            getUserEntity.setEncryptedPwd(passwordEncoder.encode(userDto.getPassword()));
+            userRepository.save(getUserEntity);
+            return true;
+        }
+        return false;
+    }
+
     public boolean updateMatchingUsers(UserDto userDto){
 
         return false;
     }
     public int updateUserAge(UserDto userDto){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime birthdate = LocalDateTime.parse(userDto.getBirthdate(),formatter);
+        LocalDate birthdate = LocalDate.parse(userDto.getBirthdate(),formatter);
         return LocalDateTime.now().getYear()-birthdate.getYear();
     }
 }

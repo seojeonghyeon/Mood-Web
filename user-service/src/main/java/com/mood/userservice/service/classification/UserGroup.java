@@ -12,13 +12,14 @@ public class UserGroup {
     UserDetailRepository userDetailRepository;
     TotalUserRepository totalUserRepository;
 
+    @Autowired
     public UserGroup(UserDetailRepository userDetailRepository, TotalUserRepository totalUserRepository){
         this.userDetailRepository=userDetailRepository;
         this.totalUserRepository=totalUserRepository;
     }
 
     public double selectDecisionTree(UserDto userDto){
-        int totalUserCount = totalUserRepository.findTotalUserEntityByDisabledIsFalse().getTotaluser();
+        int totalUserCount = totalUserRepository.findTotalUserEntityByDisabled(false).getTotaluser();
         if(totalUserCount < 500)
             return decisionTreeLevelOne(userDto);
         else if(totalUserCount < 1000)

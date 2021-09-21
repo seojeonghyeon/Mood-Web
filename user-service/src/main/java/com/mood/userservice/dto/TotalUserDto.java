@@ -9,5 +9,5 @@ public class TotalUserDto {
     private Long id;
     private boolean disabled;
     private int totaluser;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 }

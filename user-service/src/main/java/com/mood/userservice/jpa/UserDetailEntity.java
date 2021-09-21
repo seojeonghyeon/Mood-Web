@@ -21,11 +21,9 @@ public class UserDetailEntity {
     private boolean gender;
 
     @Column(nullable = false)
-    @ColumnDefault("true")
     private boolean otherM;
 
     @Column(nullable = false)
-    @ColumnDefault("true")
     private boolean otherW;
 
     @Column(nullable = false)
@@ -43,13 +41,13 @@ public class UserDetailEntity {
     @Column(nullable = false)
     private double sex;
 
-    @Column(nullable = false, length = 300)
+    @Column(nullable = false, length = 500)
     private String work;
 
-    @Column(nullable = false, length = 300)
+    @Column(nullable = false, length = 500)
     private String happy;
 
-    @Column(nullable = false, length = 300)
+    @Column(nullable = false, length = 500)
     private String dating;
 
     @Column(nullable = false)

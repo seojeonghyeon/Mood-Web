@@ -86,6 +86,7 @@ public class UserDto {
     //User's matching time
     //watching ad, then nextMatchingTime is 15 update
     //no watching ad, then next matching 6
+
     private LocalDateTime matchingTime;
     private LocalDateTime nextMatchingTime;
 

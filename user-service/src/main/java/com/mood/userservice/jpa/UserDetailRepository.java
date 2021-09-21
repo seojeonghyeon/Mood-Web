@@ -4,17 +4,26 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Long> {
+    @Nullable
     UserDetailEntity findByUserUid(String userUid);
-    int countByUserGroupAndUserGradeAndDisabled(int userGroup, String userGrade, boolean disabled);
+
+    @Nullable
+    int countByUserGroupAndUserGradeAndDisabled(double userGroup, String userGrade, boolean disabled);
+
+    @Nullable
     int countByUserGroupAndDisabled(int userGroup, boolean disabled);
+
+    @Nullable
     int countByDisabled(boolean disabled);
 
     //Matching for Man
+    @Nullable
     @Query(
             value = "SELECT DISTINCT * "+
             "FROM userdetails " +
@@ -28,7 +37,7 @@ public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Lo
             nativeQuery = true
     )
     List<UserDetailEntity> findDistinctByOtherM(
-            @Param("userGroup") int userGroup, @Param("userGrade") String userGrade, @Param("gender") boolean gender,
+            @Param("userGroup") double userGroup, @Param("userGrade") String userGrade, @Param("gender") boolean gender,
             @Param("otherM") boolean otherM, @Param("userLock") boolean userLock, @Param("disabled") boolean disabled,
             @Param("minAge") int minAge, @Param("maxAge") int maxAge,
             @Param("recentLoginTime") LocalDateTime recentLoginTime, @Param("latitude") double latitude,
@@ -36,6 +45,7 @@ public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Lo
     );
 
     //Matching for Woman
+    @Nullable
     @Query(
             value = "SELECT DISTINCT * "+
                     "FROM userdetails " +
@@ -49,7 +59,7 @@ public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Lo
             nativeQuery = true
     )
     List<UserDetailEntity> findDistinctByOtherW(
-            @Param("userGroup") int userGroup, @Param("userGrade") String userGrade, @Param("gender") boolean gender,
+            @Param("userGroup") double userGroup, @Param("userGrade") String userGrade, @Param("gender") boolean gender,
             @Param("otherW") boolean otherW, @Param("userLock") boolean userLock, @Param("disabled") boolean disabled,
             @Param("minAge") int minAge, @Param("maxAge") int maxAge,
             @Param("recentLoginTime") LocalDateTime recentLoginTime, @Param("latitude") double latitude,
