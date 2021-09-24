@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import io.jsonwebtoken.Jwts;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
-@Slf4j
 @RestController
 @RequestMapping("/")
 public class UserController {
@@ -49,11 +48,30 @@ public class UserController {
                 +", token expiration time=" + env.getProperty("token.expiration_time"));
     }
 
+    @PostMapping("/sendRegistCertification")
+    public ResponseEntity sendRegistCertification(@RequestBody RequestUser requestUser){
+        if(requestUser.getPhoneNum().isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        UserDto userDto = mapper.map(requestUser, UserDto.class);
+        userService.sendRegistCreditNumber(userDto.getPhoneNum(), requestUser.getHashkey());
+        return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
+    }
+
+    @PostMapping("/checkRegistCertification")
+    public ResponseEntity checkRegistCertification(@RequestBody RequestUser requestUser){
+        if(requestUser.getNumberId().isEmpty() || requestUser.getPhoneNum().isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        if(userService.checkRegistCertification(requestUser.getPhoneNum(), requestUser.getNumberId()))
+            return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+    }
+
     @PostMapping("/regist")
     public ResponseEntity createUser(@RequestBody RequestUser user, HttpServletResponse response){
         if(user.getEmail().isEmpty()&& user.getPassword().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
-        log.info("check "+user.isOtherM()+" "+user.isOtherW());
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(user, UserDto.class);
@@ -68,14 +86,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
-    @PostMapping("/checkPhoneNum")
-    public ResponseEntity checkPhoneNumber(@RequestBody RequestUser requestUser){
+
+    @PostMapping("/checkEmail")
+    public ResponseEntity checkEmail(@RequestBody RequestUser requestUser){
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(requestUser, UserDto.class);
-        if(requestUser.getPhoneNum().isEmpty())
+        if(requestUser.getEmail().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
-        if(userService.checkUserPhoneNumber(userDto))
+        if(userService.checkUserEmail(userDto))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
@@ -114,40 +133,52 @@ public class UserController {
     public ResponseEntity resetPassword(@RequestHeader("userToken") String userToken, @RequestBody RequestUser requestUser){
         DecodeUserToken decodeUserToken = new DecodeUserToken();
         String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
-        if(userUid.equals(null)){
+        if(userUid.equals(null))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseUser());
-        }
-        if(requestUser.getPhoneNum().equals(null) || requestUser.getPassword().equals(null)){
+        if(requestUser.getPhoneNum().equals(null) || requestUser.getPassword().equals(null))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseUser());
-        }
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(requestUser, UserDto.class);
         userDto.setUserUid(userUid);
-        //Service, Get User info from userUid, phoneNum
-        if(userService.resetPassword(userDto)){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
-        }
+        if(userService.resetPassword(userDto))  return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestHeader("userToken") String userToken, HttpServletResponse response) {
+        DecodeUserToken decodeUserToken = new DecodeUserToken();
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
+        UserDto userDto = new UserDto();
+        userDto.setUserUid(userUid);
+        userDto = userService.getUserInfo(userDto);
+        ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
+        response.addHeader("userToken", userToken);
+        return ResponseEntity.status(HttpStatus.OK).body(responseUser);
+    }
 
-
-
-//    @PostMapping("/findByEmail")
-//    public ResponseEntity findByEmail(@RequestBody RequestUser requestUser){
-//
-//    }
-
-//    @PostMapping("/certificateNumber")
-//    public ResponseEntity certificateNumber(@RequestBody String numberId){
-//
-//    }
-
-
-//    @PostMapping("/updateMatchingUsers")
-//    public ResponseEntity updateMatchingUsers(@RequestBody RequestUser requestUser){
-//
-//    }
+    @PostMapping("/autologin")
+    public ResponseEntity autoLogin(@RequestHeader("userToken") String userToken , HttpServletResponse response){
+        DecodeUserToken decodeUserToken = new DecodeUserToken();
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
+        if(userUid.equals(null))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseUser());
+        UserDto userDto = new UserDto();
+        userDto.setUserUid(userUid);
+        userDto = userService.getUserInfo(userDto);
+        ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
+        if(userDto.getUserUid().isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        String token = Jwts.builder()
+                .setSubject(userDto.getUserUid())
+                .setExpiration(new Date(System.currentTimeMillis()+Long.parseLong(env.getProperty("token.expiration_time"))))
+                .signWith(SignatureAlgorithm.HS512, env.getProperty("token.secret"))
+                .compact();
+        response.addHeader("userToken", token);
+        return ResponseEntity.status(HttpStatus.OK).body(responseUser);
+    }
 
     @PostMapping("/usergrade/regist")
     public ResponseEntity createUserGrade(@RequestBody RequestUserGrade userGrade){

@@ -10,6 +10,11 @@ spring:
       settings:
         web-allow-others: true
       path: /h2
+#  datasource:
+#    url: jdbc:mariadb://localhost:3306/mooddb
+#    driver-class-name: org.mariadb.jdbc.Driver
+#    username: root
+#    password: 00000000
 
 eureka:
   client:
@@ -19,6 +24,12 @@ eureka:
     fetch-registry: true
     instance:
       instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
+token:
+  expiration_time: 864000000
+  secret: mood_user_token_default
+
+
+
 
 logging:
   level:

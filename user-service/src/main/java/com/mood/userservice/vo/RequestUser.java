@@ -108,4 +108,6 @@ public class RequestUser {
     private int maxDistance;
 
     private String hashkey;
+
+    private String numberId;
 }

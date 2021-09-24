@@ -1,4 +1,5 @@
 package com.mood.userservice.service;
+import com.mood.userservice.dto.CertificationNumberDto;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.jpa.*;
 import com.mood.userservice.service.classification.UserGroup;
@@ -34,12 +35,13 @@ public class UserServiceImpl implements UserService {
     UserGradeRepository userGradeRepository;
     UserDetailRepository userDetailRepository;
     TotalUserRepository totalUserRepository;
+    CertificationNumberRepository certificationNumberRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
                            Environment env, CircuitBreakerFactory circuitBreakerFactory, MessageService messageService,
                            UserGradeRepository userGradeRepository, UserDetailRepository userDetailRepository,
-                           TotalUserRepository totalUserRepository){
+                           TotalUserRepository totalUserRepository, CertificationNumberRepository certificationNumberRepository){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.env=env;
@@ -48,6 +50,7 @@ public class UserServiceImpl implements UserService {
         this.userGradeRepository=userGradeRepository;
         this.userDetailRepository=userDetailRepository;
         this.totalUserRepository=totalUserRepository;
+        this.certificationNumberRepository= certificationNumberRepository;
     }
 
     @Override
@@ -116,6 +119,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean checkUserEmail(UserDto userDto) {
+        Optional<UserEntity> optional = userRepository.findByEmail(userDto.getEmail());
+        if(optional.isPresent()) return true;
+        else return false;
+    }
+
+    @Override
     public boolean checkUserPhoneNumber(UserDto userDto) {
         Optional<UserEntity> optional = userRepository.findByPhoneNum(userDto.getPhoneNum());
         if(optional.isPresent()) return true;
@@ -142,6 +152,54 @@ public class UserServiceImpl implements UserService {
         } else {
             return false;
         }
+    }
+    @Override
+    public void sendRegistCreditNumber(String phoneNum, String hashkey) {
+        int number = messageService.createRandomNumber();
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        CertificationNumberEntity certificationNumberEntity;
+        CertificationNumberDto certificationNumberDto = new CertificationNumberDto();
+
+        Optional<CertificationNumberEntity> optional
+                = certificationNumberRepository.findByPhoneNum(phoneNum);
+        if(optional.isPresent()) {
+            certificationNumberEntity = optional.get();
+            certificationNumberDto = mapper.map(certificationNumberEntity, CertificationNumberDto.class);
+        }else{
+            certificationNumberDto.setPhoneNum(phoneNum);
+        }
+        certificationNumberDto.setDisabled(false);
+        certificationNumberDto.setCreatedAt(LocalDateTime.now());
+        certificationNumberDto.setCreditNumber(number);
+        certificationNumberEntity = mapper.map(certificationNumberDto,
+                CertificationNumberEntity.class);
+        certificationNumberRepository.save(certificationNumberEntity);
+        String message = " <#> [Mood] 본인인증 번호는 ["+certificationNumberDto.getCreditNumber()+"] 입니다. "+hashkey+"  ";
+        messageService.sendMessage(message, phoneNum);
+    }
+
+    @Override
+    public boolean checkRegistCertification(String phoneNum, String numberId) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        CertificationNumberEntity certificationNumberEntity;
+        CertificationNumberDto certificationNumberDto = new CertificationNumberDto();
+
+        Optional<CertificationNumberEntity> optional
+                = certificationNumberRepository.findByPhoneNumAndDisabled(phoneNum, false);
+        if(optional.isPresent()) {
+            certificationNumberEntity = optional.get();
+            certificationNumberDto = mapper.map(certificationNumberEntity, CertificationNumberDto.class);
+            if(certificationNumberDto.getCreatedAt().plusMinutes(10).isBefore(LocalDateTime.now())){
+                if(certificationNumberDto.getCreditNumber()==Integer.parseInt(numberId)){
+                    certificationNumberDto.setDisabled(true);
+                    certificationNumberEntity = mapper.map(certificationNumberDto, CertificationNumberEntity.class);
+                    certificationNumberRepository.save(certificationNumberEntity);
+                    return true;
+                }else return false;
+            }else return false;
+        }else  return false;
     }
 
     @Override
@@ -178,5 +236,17 @@ public class UserServiceImpl implements UserService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate birthdate = LocalDate.parse(userDto.getBirthdate(),formatter);
         return LocalDateTime.now().getYear()-birthdate.getYear();
+    }
+
+    public UserDto getUserInfo(UserDto userDto){
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Optional<UserEntity> optional = userRepository.findByUserUid(userDto.getUserUid());
+        if(optional.isPresent()) {
+            UserEntity getUserEntity = optional.get();
+            userDto = modelMapper.map(getUserEntity, UserDto.class);
+            return userDto;
+        }
+        return new UserDto();
     }
 }

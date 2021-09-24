@@ -1,10 +1,6 @@
 package com.mood.userservice.jpa;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.lang.Nullable;
-
-import java.io.Serializable;
 import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
