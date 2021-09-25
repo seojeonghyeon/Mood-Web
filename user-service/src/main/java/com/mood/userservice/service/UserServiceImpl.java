@@ -244,8 +244,39 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> optional = userRepository.findByUserUid(userDto.getUserUid());
         if(optional.isPresent()) {
             UserEntity getUserEntity = optional.get();
+            if(userDto.isUserLock()){
+                UserDto lockUserDto = new UserDto();
+                lockUserDto.setUserUid(userDto.getUserUid());
+                lockUserDto.setEmail(userDto.getEmail());
+                lockUserDto.setUserLock(true);
+                //신고사유 담기-> 신고서비스 구현 필요
+                return lockUserDto;
+            }
+            if(userDto.isDisabled()){
+                UserDto disabledUserDto = new UserDto();
+                disabledUserDto.setUserUid(userDto.getUserUid());
+                disabledUserDto.setEmail(userDto.getEmail());
+                disabledUserDto.setDisabled(true);
+                return disabledUserDto;
+            }
+            if(userDto.isCreditEnabled()){
+                userDto.setCreditEnabled(false);
+            }
+            Optional<UserDetailEntity> optionalDetail = userDetailRepository.findByUserUid(userDto.getUserUid());
+            UserDetailEntity userDetailEntity = optionalDetail.get();
+
             userDto = modelMapper.map(getUserEntity, UserDto.class);
-            return userDto;
+            userDto = modelMapper.map(userDetailEntity, UserDto.class);
+
+            UserDto beforeUserDto = userDto;
+            userDto.setLoginCount(userDto.getLoginCount()+1);
+            userDto.setRecentLoginTime(LocalDateTime.now());
+
+            getUserEntity = modelMapper.map(userDto, UserEntity.class);
+            userDetailEntity = modelMapper.map(userDto, UserDetailEntity.class);
+            userRepository.save(getUserEntity);
+            userDetailRepository.save(userDetailEntity);
+            return beforeUserDto;
         }
         return new UserDto();
     }

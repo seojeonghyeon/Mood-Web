@@ -10,9 +10,10 @@ import org.springframework.lang.Nullable;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserDetailRepository extends JpaRepository<UserDetailEntity, Long> {
-    UserDetailEntity findByUserUid(String userUid);
+    Optional<UserDetailEntity> findByUserUid(String userUid);
 
     int countByUserGroupAndUserGradeAndDisabled(double userGroup, String userGrade, boolean disabled);
 
