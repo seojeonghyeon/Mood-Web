@@ -1,8 +1,11 @@
 package com.mood.userservice.service;
+import com.mood.userservice.client.LockServiceClient;
 import com.mood.userservice.dto.CertificationNumberDto;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.jpa.*;
 import com.mood.userservice.service.classification.UserGroup;
+import com.mood.userservice.vo.RequestLockUser;
+import com.mood.userservice.vo.ResponseLockUser;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
@@ -10,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.User;
@@ -36,12 +40,14 @@ public class UserServiceImpl implements UserService {
     UserDetailRepository userDetailRepository;
     TotalUserRepository totalUserRepository;
     CertificationNumberRepository certificationNumberRepository;
+    LockServiceClient lockServiceClient;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
                            Environment env, CircuitBreakerFactory circuitBreakerFactory, MessageService messageService,
                            UserGradeRepository userGradeRepository, UserDetailRepository userDetailRepository,
-                           TotalUserRepository totalUserRepository, CertificationNumberRepository certificationNumberRepository){
+                           TotalUserRepository totalUserRepository,
+                           CertificationNumberRepository certificationNumberRepository, LockServiceClient lockServiceClient){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.env=env;
@@ -51,6 +57,7 @@ public class UserServiceImpl implements UserService {
         this.userDetailRepository=userDetailRepository;
         this.totalUserRepository=totalUserRepository;
         this.certificationNumberRepository= certificationNumberRepository;
+        this.lockServiceClient=lockServiceClient;
     }
 
     @Override
@@ -76,20 +83,17 @@ public class UserServiceImpl implements UserService {
         userDto.setUserLock(false);
         userDto.setCreditEnabled(false);
         userDto.setResetMatching(true);
-        log.info("other M : "+userDto.isOtherM()+"  other W : "+userDto.isOtherM());
         //set UserGroup
         UserGroup userGroup = new UserGroup(userDetailRepository, totalUserRepository);
         userDto.setUserGroup(userGroup.selectDecisionTree(userDto));
         UserEntity userEntity = mapper.map(userDto, UserEntity.class);
         UserDetailEntity userDetailEntity = mapper.map(userDto, UserDetailEntity.class);
-        log.info("other M : "+userDetailEntity.isOtherM()+"  other W : "+userDetailEntity.isOtherM());
         userEntity.setEncryptedPwd(passwordEncoder.encode(userDto.getPassword()));
         userDetailEntity.setOtherM(userDto.isOtherM());
         userDetailEntity.setOtherW(userDto.isOtherW());
         userRepository.save(userEntity);
         userDetailRepository.save(userDetailEntity);
         UserDto returnUserDto = mapper.map(userEntity, UserDto.class);
-
         log.info("After create User : "+LocalDateTime.now() + " = "+userDto.getUserUid());
         return returnUserDto;
     }
@@ -250,6 +254,19 @@ public class UserServiceImpl implements UserService {
                 lockUserDto.setEmail(userDto.getEmail());
                 lockUserDto.setUserLock(true);
                 //신고사유 담기-> 신고서비스 구현 필요
+                log.info("Before call lock microservice");
+                CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
+                RequestLockUser requestLockUser = new RequestLockUser();
+                requestLockUser.setLockUserUid(userDto.getUserUid());
+                List<ResponseLockUser> lockUserList = circuitBreaker.run(()->lockServiceClient.getLockUser(requestLockUser),
+                        throwable -> new ArrayList<>());
+                log.info("After called lock microservice");
+                String lockReason = "";
+                for(ResponseLockUser getResponseLockUser : lockUserList){
+                    lockReason = lockReason + getResponseLockUser.getLockType()+":"
+                            +getResponseLockUser.getLockReasons()+"&";
+                }
+                lockUserDto.setUserLockReasons(lockReason);
                 return lockUserDto;
             }
             if(userDto.isDisabled()){
@@ -279,5 +296,12 @@ public class UserServiceImpl implements UserService {
             return beforeUserDto;
         }
         return new UserDto();
+    }
+
+    @Override
+    public boolean findByUserUid(String userUid) {
+        Optional<UserEntity> optional = userRepository.findByUserUid(userUid);
+        if(optional.isPresent()) return true;
+        return false;
     }
 }

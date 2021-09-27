@@ -23,8 +23,3 @@ eureka:
 logging:
   level:
     com.mood.lockservice.client: DEBUG
-management:
-  endpoints:
-    web:
-      exposure:
-        include: info, refresh, health, metrics, prometheus

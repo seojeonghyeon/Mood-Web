@@ -29,6 +29,9 @@ public class LockUserEntity {
     private String referUid;
 
     @Column(nullable = false)
+    private String fromUserUid;
+
+    @Column(nullable = false)
     private boolean lockUserDisabled;
 
     @Column(nullable = false)

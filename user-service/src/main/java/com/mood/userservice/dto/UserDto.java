@@ -102,6 +102,8 @@ public class UserDto {
     //Lock User's account
     private boolean userLock;
 
+    private String userLockReasons;
+
     //User's account is disabled. default is false.
     private boolean disabled;
 

@@ -12,6 +12,7 @@ public class LockUserDto {
     private String lockType;
     private String lockReasons;
     private String referUid;
+    private String fromUserUid;
     private boolean lockUserDisabled;
     private LocalDateTime activeTime;
 }

@@ -8,6 +8,7 @@ import com.mood.userservice.service.UserGradeService;
 import com.mood.userservice.service.UserService;
 import com.mood.userservice.vo.RequestUser;
 import com.mood.userservice.vo.RequestUserGrade;
+import com.mood.userservice.vo.ResponseLockUser;
 import com.mood.userservice.vo.ResponseUser;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -203,6 +204,17 @@ public class UserController {
         if(userGradeService.disabledUserGrade(userGradeDto)){
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
         }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+    }
+
+    @PostMapping("/userUid/exist")
+    public ResponseEntity existUserUid(@RequestBody RequestUser requestUser){
+        ResponseLockUser responseLockUser = new ResponseLockUser();
+        if(userService.findByUserUid(requestUser.getUserUid())){
+            responseLockUser.setExist(true);
+            return ResponseEntity.status(HttpStatus.OK).body(responseLockUser);
+        }
+        responseLockUser.setExist(false);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 }

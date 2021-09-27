@@ -16,4 +16,5 @@ public interface UserService extends UserDetailsService {
     void sendCreditNumber(String phoneNum, String hashkey);
     boolean resetPassword(UserDto userDto);
     UserDto getUserInfo(UserDto userDto);
+    boolean findByUserUid(String userUid);
 }
