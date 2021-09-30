@@ -37,12 +37,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     public void sendMessage(String message, String toNumber){
-        //Confirm the function, Environment wtf..
         log.info("Before send message : "+ LocalDateTime.now()+" = To : "+toNumber+" Message : "+message);
 
-        String apiKey="NCSU6S4DEQBP1YW0";
-        String apiSecret="UE3SBWDNRGNAC3HBJTSN6FNVYQYNGNFO";
-        String fromNumber="07080283359";
+        String apiKey=env.getProperty("messaging.apiKey");
+        String apiSecret=env.getProperty("messaging.apiSecret");
+        String fromNumber=env.getProperty("messaging.fromNumber");
         log.info("Before send message : "+LocalDateTime.now()+" = From : "+fromNumber+" apiKey : "+apiKey+" apiSecret : "+apiSecret);
 
         Message coolsms = new Message(apiKey, apiSecret);

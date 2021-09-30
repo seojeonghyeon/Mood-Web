@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import io.jsonwebtoken.Jwts;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+@Slf4j
 @RestController
 @RequestMapping("/")
 public class UserController {
@@ -49,6 +50,7 @@ public class UserController {
                 +", token expiration time=" + env.getProperty("token.expiration_time"));
     }
 
+    //##
     @PostMapping("/sendRegistCertification")
     public ResponseEntity sendRegistCertification(@RequestBody RequestUser requestUser){
         if(requestUser.getPhoneNum().isEmpty())
@@ -60,6 +62,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
     }
 
+    //##
     @PostMapping("/checkRegistCertification")
     public ResponseEntity checkRegistCertification(@RequestBody RequestUser requestUser){
         if(requestUser.getNumberId().isEmpty() || requestUser.getPhoneNum().isEmpty())
@@ -69,10 +72,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 
+    //##
     @PostMapping("/regist")
     public ResponseEntity createUser(@RequestBody RequestUser user, HttpServletResponse response){
         if(user.getEmail().isEmpty()&& user.getPassword().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        if(!userService.checkRegistCertificationIsTrue(user.getPhoneNum())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        }
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(user, UserDto.class);
@@ -145,19 +152,6 @@ public class UserController {
         if(userService.resetPassword(userDto))  return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
-    @PostMapping("/login")
-    public ResponseEntity login(@RequestHeader("userToken") String userToken, HttpServletResponse response) {
-        DecodeUserToken decodeUserToken = new DecodeUserToken();
-        ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
-        UserDto userDto = new UserDto();
-        userDto.setUserUid(userUid);
-        userDto = userService.getUserInfo(userDto);
-        ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
-        response.addHeader("userToken", userToken);
-        return ResponseEntity.status(HttpStatus.OK).body(responseUser);
-    }
 
     @PostMapping("/autologin")
     public ResponseEntity autoLogin(@RequestHeader("userToken") String userToken , HttpServletResponse response){
@@ -207,14 +201,28 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 
-    @PostMapping("/userUid/exist")
-    public ResponseEntity existUserUid(@RequestBody RequestUser requestUser){
+    @GetMapping("/userUid/exist/{userUid}")
+    public ResponseEntity<ResponseLockUser> existUserUid(@PathVariable String userUid){
         ResponseLockUser responseLockUser = new ResponseLockUser();
-        if(userService.findByUserUid(requestUser.getUserUid())){
+        if(userService.findByUserUid(userUid)){
             responseLockUser.setExist(true);
             return ResponseEntity.status(HttpStatus.OK).body(responseLockUser);
+        }else{
+            responseLockUser.setExist(false);
+            return ResponseEntity.status(HttpStatus.OK).body(responseLockUser);
         }
-        responseLockUser.setExist(false);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
+
+    @GetMapping("/userUid/updateLockUser/{userUid}")
+    public ResponseEntity<ResponseLockUser> updateLockUserUid(@PathVariable String userUid){
+        ResponseLockUser responseLockUser = new ResponseLockUser();
+        if(userService.updateUserLock(userUid)){
+            responseLockUser.setExist(true);
+            return ResponseEntity.status(HttpStatus.OK).body(responseLockUser);
+        }else{
+            responseLockUser.setExist(false);
+            return ResponseEntity.status(HttpStatus.OK).body(responseLockUser);
+        }
+    }
+
 }

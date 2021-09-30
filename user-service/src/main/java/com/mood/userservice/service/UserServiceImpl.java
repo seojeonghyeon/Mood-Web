@@ -7,9 +7,6 @@ import com.mood.userservice.service.classification.UserGroup;
 import com.mood.userservice.vo.RequestLockUser;
 import com.mood.userservice.vo.ResponseLockUser;
 import lombok.extern.slf4j.Slf4j;
-import net.nurigo.java_sdk.api.Message;
-import net.nurigo.java_sdk.exceptions.CoolsmsException;
-import org.json.simple.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -188,22 +184,47 @@ public class UserServiceImpl implements UserService {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         CertificationNumberEntity certificationNumberEntity;
-        CertificationNumberDto certificationNumberDto = new CertificationNumberDto();
+        CertificationNumberDto certificationNumberDto;
 
         Optional<CertificationNumberEntity> optional
                 = certificationNumberRepository.findByPhoneNumAndDisabled(phoneNum, false);
         if(optional.isPresent()) {
             certificationNumberEntity = optional.get();
             certificationNumberDto = mapper.map(certificationNumberEntity, CertificationNumberDto.class);
-            if(certificationNumberDto.getCreatedAt().plusMinutes(10).isBefore(LocalDateTime.now())){
+            if(LocalDateTime.now().isBefore(certificationNumberDto.getCreatedAt().plusMinutes(10))){
                 if(certificationNumberDto.getCreditNumber()==Integer.parseInt(numberId)){
-                    certificationNumberDto.setDisabled(true);
-                    certificationNumberEntity = mapper.map(certificationNumberDto, CertificationNumberEntity.class);
-                    certificationNumberRepository.save(certificationNumberEntity);
+                    optional.ifPresent(selectUser ->{
+                        selectUser.setDisabled(true);
+                        certificationNumberRepository.save(selectUser);
+                    });
                     return true;
                 }else return false;
             }else return false;
         }else  return false;
+    }
+    @Override
+    public boolean checkRegistCertificationIsTrue(String phoneNum) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        CertificationNumberEntity certificationNumberEntity;
+
+        Optional<CertificationNumberEntity> optional
+                = certificationNumberRepository.findByPhoneNumAndDisabled(phoneNum, true);
+        if (optional.isPresent()) {
+            certificationNumberEntity = optional.get();
+            if(LocalDateTime.now().isBefore(certificationNumberEntity.getCreatedAt().plusMinutes(30)))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateUserLock(String userUid) {
+        Optional<UserEntity> optional = userRepository.findByUserUid(userUid);
+        optional.ifPresent(selectUser ->{
+            selectUser.setDisabled(true);
+        });
+        return false;
     }
 
     @Override

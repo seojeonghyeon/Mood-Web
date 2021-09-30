@@ -18,10 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/lock-service")
+@RequestMapping("/")
 public class LockController {
     private Environment env;
     private LockService lockService;
@@ -34,18 +35,19 @@ public class LockController {
     //Back-end Server, Lock Service Health Check
     @GetMapping("/health_check")
     public String status(){
-        return String.format("It's Working in User Service"
+        return String.format("It's Working in Lock Service"
                 +", port(local.server.port)=" + env.getProperty("local.server.port")
                 +", port(server.port)=" + env.getProperty("server.port")
                 +", token secret=" + env.getProperty("token.secret")
                 +", token expiration time=" + env.getProperty("token.expiration_time"));
     }
 
-    @PostMapping("/addLockUser")
-    public ResponseEntity addLockUser(@RequestHeader("userToken") String userToken, @RequestBody RequestLockUser requestLockUser) {
-        DecodeUserToken decodeUserToken = new DecodeUserToken();
-        String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
-        if(lockService.checkUserUid(userUid)){
+    @PostMapping("/{userUid}/addLockUser")
+    public ResponseEntity<ResponseLockUser> addLockUser(@PathVariable("userUid")String userUid, @RequestBody RequestLockUser requestLockUser) {
+        log.info("add Lock User : "+userUid);
+        log.info("contents : "+requestLockUser.getLockUserUid()+" "+requestLockUser.getLockType()+" ");
+        boolean existUserUid = lockService.checkUserUid(userUid);
+        if(existUserUid){
             if( (!requestLockUser.getLockUserUid().isEmpty()) && (!requestLockUser.getLockReasons().isEmpty()) &&
                     (!requestLockUser.getLockType().isEmpty()) && (!requestLockUser.getReferUid().isEmpty())){
                 if(lockService.checkUserUid(requestLockUser.getLockUserUid())){
@@ -54,6 +56,7 @@ public class LockController {
                     LockUserDto lockUserDto = modelMapper.map(requestLockUser, LockUserDto.class);
                     lockUserDto.setFromUserUid(userUid);
                     lockUserDto.setActiveTime(LocalDateTime.now());
+                    log.info(lockUserDto+" "+lockUserDto.getLockUserUid());
                     if(lockService.createLockUser(lockUserDto)){
                         return ResponseEntity.status(HttpStatus.OK).body(new ResponseLockUser());
                     }
