@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface LockUserRepository extends CrudRepository<LockUserEntity, Long> {
     Optional<LockUserEntity> findByLockUid(String lockUid);
     Iterable<LockUserEntity> findByLockUserUid(String lockUserUid);
+    Optional<LockUserEntity> findByLockUserUidAndLockType(String lockUserUid, String lockType);
 }

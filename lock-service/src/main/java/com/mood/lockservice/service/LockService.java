@@ -8,6 +8,6 @@ import java.util.List;
 public interface LockService {
     boolean createLockUser(LockUserDto lockUserDto);
     Iterable<LockUserEntity> getLockUser(String lockUserUid);
-    LockUserDto updateLockUser(LockUserDto lockUserDto);
+    boolean updateLockUser(String userUid, String lockType);
     boolean checkUserUid(String userUid);
 }

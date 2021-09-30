@@ -18,5 +18,5 @@ public interface UserService extends UserDetailsService {
     UserDto getUserInfo(UserDto userDto);
     boolean findByUserUid(String userUid);
     boolean checkRegistCertificationIsTrue(String phoneNum);
-    boolean updateUserLock(String userUid);
+    boolean updateUserLock(String userUid, boolean lockBoolean);
 }

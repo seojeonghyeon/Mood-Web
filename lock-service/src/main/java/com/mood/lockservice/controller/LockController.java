@@ -44,8 +44,6 @@ public class LockController {
 
     @PostMapping("/{userUid}/addLockUser")
     public ResponseEntity<ResponseLockUser> addLockUser(@PathVariable("userUid")String userUid, @RequestBody RequestLockUser requestLockUser) {
-        log.info("add Lock User : "+userUid);
-        log.info("contents : "+requestLockUser.getLockUserUid()+" "+requestLockUser.getLockType()+" ");
         boolean existUserUid = lockService.checkUserUid(userUid);
         if(existUserUid){
             if( (!requestLockUser.getLockUserUid().isEmpty()) && (!requestLockUser.getLockReasons().isEmpty()) &&
@@ -65,6 +63,16 @@ public class LockController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseLockUser());
     }
+
+    @PostMapping("/{userUid}/updateLockUser")
+    public ResponseEntity<ResponseLockUser> updateLockUser(@PathVariable("userUid")String userUid, @RequestBody RequestLockUser requestLockUser) {
+        if(userUid.isEmpty() && requestLockUser.getLockType().isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseLockUser());
+        if(lockService.updateLockUser(userUid, requestLockUser.getLockType()))
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseLockUser());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseLockUser());
+    }
+
 
     @PostMapping("/getLockUser")
     public ResponseEntity<List<ResponseLockUser>> getLockUser(@RequestBody RequestLockUser requestLockUser) {

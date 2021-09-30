@@ -213,10 +213,10 @@ public class UserController {
         }
     }
 
-    @GetMapping("/userUid/updateLockUser/{userUid}")
-    public ResponseEntity<ResponseLockUser> updateLockUserUid(@PathVariable String userUid){
+    @GetMapping("/userUid/updateLockUser/{userUid}/{lockBoolean}")
+    public ResponseEntity<ResponseLockUser> updateLockUserUid(@PathVariable String userUid, @PathVariable boolean lockBoolean){
         ResponseLockUser responseLockUser = new ResponseLockUser();
-        if(userService.updateUserLock(userUid)){
+        if(userService.updateUserLock(userUid, lockBoolean)){
             responseLockUser.setExist(true);
             return ResponseEntity.status(HttpStatus.OK).body(responseLockUser);
         }else{

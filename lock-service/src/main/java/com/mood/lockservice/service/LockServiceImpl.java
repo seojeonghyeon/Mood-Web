@@ -13,6 +13,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -42,7 +46,7 @@ public class LockServiceImpl implements LockService{
         log.info("Before call users microservice");
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
         ResponseLockUser responseLockUser = circuitBreaker.run(()->
-                userServiceClient.updateLockUser(lockUserDto.getLockUserUid()));
+                userServiceClient.updateLockUser(lockUserDto.getLockUserUid(),true));
         log.info("After called users microservice");
 
         LockUserEntity lockUserEntity = mapper.map(lockUserDto, LockUserEntity.class);
@@ -56,8 +60,29 @@ public class LockServiceImpl implements LockService{
     }
 
     @Override
-    public LockUserDto updateLockUser(LockUserDto lockUserDto) {
-        return null;
+    public boolean updateLockUser(String userUid, String lockType) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Optional<LockUserEntity> optional
+                = lockUserRepository.findByLockUserUidAndLockType(userUid, lockType);
+        if(optional.isPresent()){
+            Iterable<LockUserEntity> lockUserEntities = lockUserRepository.findByLockUserUid(userUid);
+            List<ResponseLockUser> result = new ArrayList<>();
+            lockUserEntities.forEach(v->
+                    result.add(new ModelMapper().map(v, ResponseLockUser.class)));
+            optional.ifPresent(selectUser ->{
+                selectUser.setLockUserDisabled(false);
+                lockUserRepository.save(selectUser);
+            });
+            if(result.size()<=1){
+                log.info("Before call users microservice");
+                CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
+                ResponseLockUser responseLockUser = circuitBreaker.run(()->
+                        userServiceClient.updateLockUser(userUid,false));
+                log.info("After called users microservice");
+            }
+        }
+        return true;
     }
 
     @Override

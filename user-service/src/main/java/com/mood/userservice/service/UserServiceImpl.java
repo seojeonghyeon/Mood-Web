@@ -219,12 +219,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUserLock(String userUid) {
+    public boolean updateUserLock(String userUid, boolean lockBoolean) {
         Optional<UserEntity> optional = userRepository.findByUserUid(userUid);
         optional.ifPresent(selectUser ->{
-            selectUser.setDisabled(true);
+            selectUser.setUserLock(lockBoolean);
+            userRepository.save(selectUser);
         });
-        return false;
+        return true;
     }
 
     @Override
