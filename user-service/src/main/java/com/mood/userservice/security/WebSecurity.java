@@ -26,15 +26,11 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-//        http.authorizeRequests().antMatchers("/users/**").permitAll();
         http.authorizeRequests().antMatchers("/actuator/**").permitAll();
         http.authorizeRequests().antMatchers("/**")
-                //Passing IP
-//               .hasIpAddress("192.168.0.11")
                 .permitAll()
                 .and()
                 .addFilter(getAuthenticationFilter());
-        //h2 프레임별로 나누어져 있는데 그것을 무시하도록 설정
         http.headers().frameOptions().disable();
     }
 

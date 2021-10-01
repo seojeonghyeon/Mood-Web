@@ -18,8 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import io.jsonwebtoken.Jwts;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 @Slf4j
@@ -49,6 +52,17 @@ public class UserController {
                 +", token secret=" + env.getProperty("token.secret")
                 +", token expiration time=" + env.getProperty("token.expiration_time"));
     }
+
+//    @PostMapping("/testURL")
+//    public String statusRestfulAPI(HttpServletRequest request){
+//        DecodeUserToken decodeUserToken = new DecodeUserToken();
+//        String authorizationHeader = request.getHeader().get.get(org.springframework.http.HttpHeaders.AUTHORIZATION).get(0);
+//        String jwt = authorizationHeader.replace("Bearer","");
+//        String userUid = decodeUserToken.getUserUidByUserToken(jwt, env);
+//        log.info("userUid : "+ userUid);
+//        String result = "userToken : "+jwt+" userUid : "+ userUid;
+//        return result;
+//    }
 
     //##
     @PostMapping("/sendRegistCertification")
