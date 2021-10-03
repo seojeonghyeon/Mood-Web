@@ -304,18 +304,18 @@ public class UserServiceImpl implements UserService {
             Optional<UserDetailEntity> optionalDetail = userDetailRepository.findByUserUid(userDto.getUserUid());
             UserDetailEntity userDetailEntity = optionalDetail.get();
 
-            userDto = modelMapper.map(getUserEntity, UserDto.class);
-            userDto = modelMapper.map(userDetailEntity, UserDto.class);
-
-            UserDto beforeUserDto = userDto;
-            userDto.setLoginCount(userDto.getLoginCount()+1);
-            userDto.setRecentLoginTime(LocalDateTime.now());
-
-            getUserEntity = modelMapper.map(userDto, UserEntity.class);
-            userDetailEntity = modelMapper.map(userDto, UserDetailEntity.class);
+            optional.ifPresent(selectUser ->{
+                selectUser.setLoginCount(userDto.getLoginCount()+1);
+                selectUser.setRecentLoginTime(LocalDateTime.now());
+                userRepository.save(selectUser);
+            });
+            optionalDetail.ifPresent(selectUser ->{
+                selectUser.setRecentLoginTime(LocalDateTime.now());
+                userDetailRepository.save(selectUser);
+            });
             userRepository.save(getUserEntity);
             userDetailRepository.save(userDetailEntity);
-            return beforeUserDto;
+            return userDto;
         }
         return new UserDto();
     }

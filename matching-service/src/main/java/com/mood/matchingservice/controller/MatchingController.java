@@ -1,6 +1,7 @@
 package com.mood.matchingservice.controller;
 
-import com.mood.matchingservice.decode.DecodeUserToken;
+import com.mood.matchingservice.auth.AuthorizationExtractor;
+import com.mood.matchingservice.auth.BearerAuthConverser;
 import com.mood.matchingservice.dto.MatchingUserDto;
 import com.mood.matchingservice.service.MatchingService;
 import com.mood.matchingservice.vo.RequestUser;
@@ -13,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/matching-service")
@@ -49,9 +50,9 @@ public class MatchingController {
 
     //get MatchingUser for Androids
     @PostMapping("/getMatchingUsers")
-    public ResponseEntity getMatchingUsers(@RequestHeader String userToken){
-        DecodeUserToken decodeUserToken = new DecodeUserToken();
-        String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
+    public ResponseEntity getMatchingUsers(HttpServletRequest request, @RequestHeader String userToken){
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
         if(userUid.equals(null)){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMatchingUser());
         }

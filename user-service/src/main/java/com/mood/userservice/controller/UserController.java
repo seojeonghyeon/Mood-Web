@@ -2,7 +2,6 @@ package com.mood.userservice.controller;
 
 import com.mood.userservice.auth.AuthorizationExtractor;
 import com.mood.userservice.auth.BearerAuthConverser;
-import com.mood.userservice.decode.DecodeUserToken;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.dto.UserGradeDto;
 import com.mood.userservice.service.MatchingService;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import io.jsonwebtoken.Jwts;
 

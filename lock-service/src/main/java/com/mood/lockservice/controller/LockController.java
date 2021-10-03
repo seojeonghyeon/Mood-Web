@@ -1,6 +1,7 @@
 package com.mood.lockservice.controller;
 
-import com.mood.lockservice.decode.DecodeUserToken;
+import com.mood.lockservice.auth.AuthorizationExtractor;
+import com.mood.lockservice.auth.BearerAuthConverser;
 import com.mood.lockservice.dto.LockUserDto;
 import com.mood.lockservice.jpa.LockUserEntity;
 import com.mood.lockservice.service.LockService;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,9 @@ public class LockController {
     }
 
     @PostMapping("/{userUid}/addLockUser")
-    public ResponseEntity<ResponseLockUser> addLockUser(@PathVariable("userUid")String userUid, @RequestBody RequestLockUser requestLockUser) {
+    public ResponseEntity<ResponseLockUser> addLockUser(HttpServletRequest request, @RequestBody RequestLockUser requestLockUser) {
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
         boolean existUserUid = lockService.checkUserUid(userUid);
         if(existUserUid){
             if( (!requestLockUser.getLockUserUid().isEmpty()) && (!requestLockUser.getLockReasons().isEmpty()) &&
