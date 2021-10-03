@@ -44,7 +44,7 @@ public class LockController {
                 +", token expiration time=" + env.getProperty("token.expiration_time"));
     }
 
-    @PostMapping("/{userUid}/addLockUser")
+    @PostMapping("/addLockUser")
     public ResponseEntity<ResponseLockUser> addLockUser(HttpServletRequest request, @RequestBody RequestLockUser requestLockUser) {
         BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
         String userUid = bearerAuthConverser.handle(request, env);
