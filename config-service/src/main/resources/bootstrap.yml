@@ -1,5 +1,7 @@
 encrypt:
+#  key: The9Beginning5Is0Small6But3The0EndWillBeGreat
   key-store:
-    location: file://${user.home}/Documents/Work/keystore/apiEncryptionKey.jks
-    password: test1234
+#    location: file:/moodMSAKey.jks
+    password: mood950630
     alias: apiEncryptionKey
+    location: file://${user.home}/Documents/Work/keystore/MoodMSAKey/moodMSAKey.jks

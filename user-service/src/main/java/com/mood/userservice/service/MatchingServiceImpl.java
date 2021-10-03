@@ -1,169 +1,101 @@
 package com.mood.userservice.service;
 
+import com.mood.userservice.client.MatchingServiceClient;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.jpa.*;
+import com.mood.userservice.service.search.MatchingUsers;
+import com.mood.userservice.service.search.MoodDistance;
+import com.mood.userservice.vo.MatchingData;
+import com.mood.userservice.vo.RequestMatchingUser;
+import com.mood.userservice.vo.ResponseMatchingUser;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Slf4j
-public class MatchingServiceImpl {
+public class MatchingServiceImpl implements MatchingService{
+
     UserRepository userRepository;
     UserDetailRepository userDetailRepository;
     UserGradeRepository userGradeRepository;
-    BlockUserRepository blockUserRepository;
     Environment env;
+    MatchingServiceClient matchingServiceClient;
     CircuitBreakerFactory circuitBreakerFactory;
 
     @Autowired
     public MatchingServiceImpl(UserRepository userRepository, UserDetailRepository userDetailRepository,
-                           UserGradeRepository userGradeRepository,BlockUserRepository blockUserRepository, Environment env, CircuitBreakerFactory circuitBreakerFactory){
+                               UserGradeRepository userGradeRepository, Environment env,
+                               MatchingServiceClient matchingServiceClient, CircuitBreakerFactory circuitBreakerFactory){
         this.userRepository = userRepository;
-        this.userDetailRepository= userDetailRepository;
         this.userGradeRepository = userGradeRepository;
-        this.blockUserRepository = blockUserRepository;
         this.env=env;
         this.circuitBreakerFactory = circuitBreakerFactory;
+        this.userDetailRepository = userDetailRepository;
     }
 
-    public boolean updateMatchingUsers(UserDto userDto){
-        List<UserDetailEntity> userDetailEntity = new ArrayList<>();
-        //Man, want to woman
-        if(userDto.isGender() && !userDto.isOtherM() &&  userDto.isOtherW())
-            userDetailEntity=getMatchingUsers(false,  true,  userDto,  2);
-            //Man, want to man
-        else if(userDto.isGender() && userDto.isOtherM() &&  !userDto.isOtherW())
-            userDetailEntity=getMatchingUsers(true,  true,  userDto,  2);
-            //Man, want to woman, man
-        else if(userDto.isGender() && userDto.isOtherM() &&  !userDto.isOtherW()){
-            int Ncheck=1;
-            userDetailEntity=getMatchingUsers(true, true, userDto, 1);
-            if(userDetailEntity.isEmpty())
-                Ncheck=2;
-            if(Ncheck==2)
-                userDetailEntity=getMatchingUsers(false, true, userDto, Ncheck);
-            else
-                userDetailEntity.add(getMatchingUsers(false, true, userDto, Ncheck).get(0));
-        }
-        //Woman, want to woman
-        else if(!userDto.isGender() && !userDto.isOtherM() &&  userDto.isOtherW())
-            userDetailEntity=getMatchingUsers(false,  false,  userDto,  2);
-            //Woman, want to man
-        else if(!userDto.isGender() && userDto.isOtherM() &&  !userDto.isOtherW())
-            userDetailEntity=getMatchingUsers(true,  false,  userDto,  2);
-            //Woman, want to woman, man
-        else if(!userDto.isGender() && userDto.isOtherM() &&  userDto.isOtherW()){
-            int Ncheck=1;
-            userDetailEntity=getMatchingUsers(false, false, userDto, 1);
-            if(userDetailEntity.isEmpty())
-                Ncheck=2;
-            if(Ncheck==2)
-                userDetailEntity=getMatchingUsers(true, false, userDto, Ncheck);
-            else
-                userDetailEntity.add(getMatchingUsers(true, false, userDto, Ncheck).get(0));
-        }else{
-            log.info("Matching is Fail : no want anyone");
-            return false;
-        }
-        return false;
-    }
-
-
-    public List<UserDetailEntity> getMatchingUsers(boolean gender, boolean otherGender, UserDto userDto, int N){
-        int number1 = 0;
-        int number2 = 0;
-        Random random = new Random();
+    @Override
+    public void updateMatchingUsers(UserDto userDto) {
         ModelMapper mapper = new ModelMapper();
-        List<BlockUserEntity> blockUserEntities = blockUserRepository.findDistinctByUserUidAndDisabled(userDto.getUserUid(),false);
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        UserDetailEntity userDetailEntity = mapper.map(userDto, UserDetailEntity.class);
-        List<UserDetailEntity> getUserDetailEntity;
-        String newbie = userGradeRepository.findByGradeType("newbie").getGradeUid();
-        String basic = userGradeRepository.findByGradeType("basic").getGradeUid();
-        String heavy = userGradeRepository.findByGradeType("heavy").getGradeUid();
-        String VIP = userGradeRepository.findByGradeType("VIP").getGradeUid();
+        UserDetailEntity updateUserDetailEntity = mapper.map(userDto, UserDetailEntity.class);
+        MoodDistance moodDistance = new MoodDistance();
+        MatchingUsers matchingUser = new MatchingUsers(userRepository, userDetailRepository, userGradeRepository);
 
-        //man
-        if(otherGender){
-            getUserDetailEntity = userDetailRepository
-                    .findTop20ByUserGroupAndGenderAndOtherMAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime
-                            (userDetailEntity.getUserGroup(), gender, true,
-                                    userDetailEntity.getMaxDistance(), newbie, false,
-                                    userDetailEntity.getRecentLoginTime(), userDetailEntity.getMinAge(),
-                                    userDetailEntity.getMaxAge());
-            getUserDetailEntity.addAll(userDetailRepository
-                    .findTop25ByUserGroupAndGenderAndOtherMAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime
-                            (userDetailEntity.getUserGroup(), gender, true,
-                                    userDetailEntity.getMaxDistance(), basic,false,
-                                    userDetailEntity.getRecentLoginTime(), userDetailEntity.getMinAge(),
-                                    userDetailEntity.getMaxAge()));
-            getUserDetailEntity.addAll(userDetailRepository
-                    .findTop25ByUserGroupAndGenderAndOtherMAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime
-                            (userDetailEntity.getUserGroup(), gender, true,
-                                    userDetailEntity.getMaxDistance(), heavy,false,
-                                    userDetailEntity.getRecentLoginTime(), userDetailEntity.getMinAge(),
-                                    userDetailEntity.getMaxAge()));
-            getUserDetailEntity.addAll(userDetailRepository
-                    .findTop30ByUserGroupAndGenderAndOtherMAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime
-                            (userDetailEntity.getUserGroup(), gender, true,
-                                    userDetailEntity.getMaxDistance(), VIP,false,
-                                    userDetailEntity.getRecentLoginTime(), userDetailEntity.getMinAge(),
-                                    userDetailEntity.getMaxAge()));
+        //Matching Users, 2
+        //Count percentage and get MatchingUsers
+        Map<String, Integer> count = matchingUser.percentageCalculate(userDto);
+        List<UserDetailEntity> matchingUsers = matchingUser.getMatchingUsers(userDto, count);
+        List<RequestMatchingUser> matchingUserList = new ArrayList<RequestMatchingUser>();
+        for(UserDetailEntity userDetailEntity : matchingUsers){
+            Optional<UserEntity> optional = userRepository.findByUserUid(userDetailEntity.getUserUid());
+            if(optional.isPresent()) {
+                UserEntity userEntity = optional.get();
+                RequestMatchingUser requestMatchingUser = mapper.map(userDetailEntity, RequestMatchingUser.class);
+                requestMatchingUser.setProfileIcon(userEntity.getProfileImageIcon());
+                requestMatchingUser.setProfileImage(userEntity.getProfileImage());
+                requestMatchingUser.setPhysicalDistance(distance(userDto.getLatitude(), userDto.getLongitude(),
+                        userDetailEntity.getLatitude(), userDetailEntity.getLongitude()));
+                requestMatchingUser.setNickname(userEntity.getNickname());
+
+                UserDto mathcingUserDto = mapper.map(requestMatchingUser, UserDto.class);
+                MatchingData matchingData = new MatchingData();
+                matchingData.setMoodDistance(moodDistance.search(userDto, mathcingUserDto));
+                matchingData.setMatchingTime(LocalDateTime.now());
+
+                requestMatchingUser.setMatchingData(matchingData);
+                matchingUserList.add(requestMatchingUser);
+            }
         }
-        //woman
-        else{
-            getUserDetailEntity = userDetailRepository
-                    .findTop20ByUserGroupAndGenderAndOtherWAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime
-                            (userDetailEntity.getUserGroup(), gender, true,
-                                    userDetailEntity.getMaxDistance(), newbie,false,
-                                    userDetailEntity.getRecentLoginTime(), userDetailEntity.getMinAge(),
-                                    userDetailEntity.getMaxAge());
-            getUserDetailEntity.addAll(userDetailRepository
-                    .findTop25ByUserGroupAndGenderAndOtherWAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime
-                            (userDetailEntity.getUserGroup(), gender, true,
-                                    userDetailEntity.getMaxDistance(), basic,false,
-                                    userDetailEntity.getRecentLoginTime(), userDetailEntity.getMinAge(),
-                                    userDetailEntity.getMaxAge()));
-            getUserDetailEntity.addAll(userDetailRepository
-                    .findTop25ByUserGroupAndGenderAndOtherWAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime
-                            (userDetailEntity.getUserGroup(), gender, true,
-                                    userDetailEntity.getMaxDistance(), heavy,false,
-                                    userDetailEntity.getRecentLoginTime(), userDetailEntity.getMinAge(),
-                                    userDetailEntity.getMaxAge()));
-            getUserDetailEntity.addAll(userDetailRepository
-                    .findTop30ByUserGroupAndGenderAndOtherWAndMaxDistanceAndUserGradeAndDisabledAndRecentLoginTimeGreaterThanEqualAndUserAgeBetweenOrderByRecentLoginTime
-                            (userDetailEntity.getUserGroup(), gender, true,
-                                    userDetailEntity.getMaxDistance(), VIP,false,
-                                    userDetailEntity.getRecentLoginTime(), userDetailEntity.getMinAge(),
-                                    userDetailEntity.getMaxAge()));
-        }
-        for(UserDetailEntity i : getUserDetailEntity)
-            for(BlockUserEntity j : blockUserEntities)
-                if(i.getPhoneNum().equals(j.getBlockPhoneNum()))
-                    getUserDetailEntity.remove(i);
-        List<UserDetailEntity> returnUserDetailEntity = new ArrayList<>();
-        if(N==1 && getUserDetailEntity.size() >= 2){
-            number1 = (random.nextInt(getUserDetailEntity.size()));
-            returnUserDetailEntity.add(getUserDetailEntity.get(number1));
-        }else if(N==2 && getUserDetailEntity.size() >= 2){
-            do{
-                number1 = (random.nextInt(getUserDetailEntity.size()));
-                number2 = (random.nextInt(getUserDetailEntity.size()));
-            }while(number1 == number2);
-            returnUserDetailEntity.add(getUserDetailEntity.get(number1));
-            returnUserDetailEntity.add(getUserDetailEntity.get(number2));
-        }else{
-            log.info("Can not do matching service : matching data is lower than 2");
-            return null;
-        }
-        return returnUserDetailEntity;
+
+        log.info("Before call matching microservice");
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
+        List<ResponseMatchingUser> matchingList
+                = circuitBreaker.run(()->matchingServiceClient.updateMatchingUsers(matchingUserList),
+                throwable -> new ArrayList<>());
+        log.info("After called matching microservice");
+
     }
+
+    //two point distance
+    public double distance(double lat1, double lon1, double lat2, double lon2) {
+        return 6371*Math.acos(Math.cos(deg2rad(lat1))*Math.cos(deg2rad(lat2))*Math.cos(deg2rad(lon2-lon1))+Math.sin(deg2rad(lat1))*Math.sin(deg2rad(lat2)));
+    }
+    // This function converts decimal degrees to radians
+    private static double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+    // This function converts radians to decimal degrees
+    private static double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
+    }
+
+
 }

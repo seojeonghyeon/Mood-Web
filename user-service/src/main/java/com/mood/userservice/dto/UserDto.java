@@ -53,7 +53,7 @@ public class UserDto {
     private double latitude;
     private double longitude;
 
-   //Sublocation Name, Eng for User's grade on VIP . Alert a Kor in need.
+    //Sublocation Name, Eng for User's grade on VIP . Alert a Kor in need.
     private String subLocation;
     private double subLatitude;
     private double subLongitude;
@@ -71,8 +71,8 @@ public class UserDto {
     //For matching, max distance is hoped matching.
     private int maxDistance;
 
-    //Clustering, user group.
-    private int userGroup;
+    //Classification, user group.
+    private double userGroup;
 
     //pay Crash
     private int coin;
@@ -86,6 +86,7 @@ public class UserDto {
     //User's matching time
     //watching ad, then nextMatchingTime is 15 update
     //no watching ad, then next matching 6
+
     private LocalDateTime matchingTime;
     private LocalDateTime nextMatchingTime;
 
@@ -100,6 +101,8 @@ public class UserDto {
 
     //Lock User's account
     private boolean userLock;
+
+    private String userLockReasons;
 
     //User's account is disabled. default is false.
     private boolean disabled;

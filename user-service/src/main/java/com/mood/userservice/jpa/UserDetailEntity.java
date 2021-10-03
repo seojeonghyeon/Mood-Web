@@ -14,21 +14,16 @@ public class UserDetailEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String userUid;
-
-    @Column(nullable = false, unique = true)
-    private String phoneNum;
 
     @Column(nullable = false)
     private boolean gender;
 
     @Column(nullable = false)
-    @ColumnDefault("true")
     private boolean otherM;
 
     @Column(nullable = false)
-    @ColumnDefault("true")
     private boolean otherW;
 
     @Column(nullable = false)
@@ -46,13 +41,13 @@ public class UserDetailEntity {
     @Column(nullable = false)
     private double sex;
 
-    @Column(nullable = false, length = 300)
+    @Column(nullable = false, length = 500)
     private String work;
 
-    @Column(nullable = false, length = 300)
+    @Column(nullable = false, length = 500)
     private String happy;
 
-    @Column(nullable = false, length = 300)
+    @Column(nullable = false, length = 500)
     private String dating;
 
     @Column(nullable = false)
@@ -74,7 +69,6 @@ public class UserDetailEntity {
     private double subLongitude;
 
     @Column(nullable = false)
-    @ColumnDefault("newbie")
     private String userGrade;
 
     @Column(nullable = false)
@@ -96,10 +90,13 @@ public class UserDetailEntity {
     private int maxDistance;
 
     @Column(nullable = true)
-    private int userGroup;
+    private double userGroup;
 
     @Column(nullable = false)
     private LocalDateTime recentLoginTime;
+
+    @Column(nullable = false)
+    private boolean userLock;
 
     @Column(nullable = false)
     private boolean disabled;

@@ -38,10 +38,10 @@ public class RequestUser {
     private boolean gender;
 
     //User's hoping a Matching Gender Man="True"
-    private boolean other_M;
+    private boolean otherM;
 
     //User's hoping a Matching Gender Woman="True"
-    private boolean other_W;
+    private boolean otherW;
 
     @Min(value = 0, message = "Min Value is 0")
     @Max(value = 5, message = "Max value is 5")
@@ -106,4 +106,8 @@ public class RequestUser {
     @Min(value = 10, message = "Min Age is 20")
     @Max(value = 90, message = "Max Age is 90")
     private int maxDistance;
+
+    private String hashkey;
+
+    private String numberId;
 }

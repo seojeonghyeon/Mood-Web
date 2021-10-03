@@ -15,7 +15,7 @@ spring:
   cloud:
     gateway:
       routes:
-        #          login
+        # login
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
@@ -24,8 +24,7 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
-
-        #          regist
+        #regist
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
@@ -34,8 +33,25 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
-
-        #                  for GET
+        #sendRegistCertification
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/sendRegistCertification
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        #checkRegistCertification
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/checkRegistCertification
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        #1
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
@@ -44,8 +60,16 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
-            - AuthorizationHeaderFilter
-        #                  for POST
+        #2
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        #3
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
@@ -54,6 +78,34 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+        #4
+        - id: lock-service
+          uri: lb://LOCK-SERVICE
+          predicates:
+            - Path=/lock-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/lock-service/(?<segment>.*), /$\{segment}
+        #5
+        - id: lock-service
+          uri: lb://LOCK-SERVICE
+          predicates:
+            - Path=/lock-service/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/lock-service/(?<segment>.*), /$\{segment}
+        #6
+        - id: lock-service
+          uri: lb://LOCK-SERVICE
+          predicates:
+            - Path=/lock-service/**
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/lock-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
 
 management:

@@ -20,13 +20,14 @@ eureka:
     instance:
       instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
 
+
 logging:
   level:
-    com.example.userservice.client: DEBUG
+    com.mood.userservice.client: DEBUG
 management:
   endpoints:
     web:
       exposure:
-        include: info, refresh, health, metrics, prometheus
+        include: info, refresh, health, metrics
 
 

@@ -19,7 +19,7 @@ public class ResponseMatchingUser {
 
     private String location;
 
-    private String physicalDistance;
+    private double physicalDistance;
 
     private int respect;
 
