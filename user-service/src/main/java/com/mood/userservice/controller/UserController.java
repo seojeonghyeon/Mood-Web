@@ -1,5 +1,7 @@
 package com.mood.userservice.controller;
 
+import com.mood.userservice.auth.AuthorizationExtractor;
+import com.mood.userservice.auth.BearerAuthConverser;
 import com.mood.userservice.decode.DecodeUserToken;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.dto.UserGradeDto;
@@ -55,12 +57,8 @@ public class UserController {
 
 //    @PostMapping("/testURL")
 //    public String statusRestfulAPI(HttpServletRequest request){
-//        DecodeUserToken decodeUserToken = new DecodeUserToken();
-//        String authorizationHeader = request.getHeader().get.get(org.springframework.http.HttpHeaders.AUTHORIZATION).get(0);
-//        String jwt = authorizationHeader.replace("Bearer","");
-//        String userUid = decodeUserToken.getUserUidByUserToken(jwt, env);
-//        log.info("userUid : "+ userUid);
-//        String result = "userToken : "+jwt+" userUid : "+ userUid;
+//        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+//        String result = bearerAuthConverser.handle(request, env);
 //        return result;
 //    }
 
@@ -152,9 +150,9 @@ public class UserController {
     }
 
     @PostMapping("/resetPassword")
-    public ResponseEntity resetPassword(@RequestHeader("userToken") String userToken, @RequestBody RequestUser requestUser){
-        DecodeUserToken decodeUserToken = new DecodeUserToken();
-        String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
+    public ResponseEntity resetPassword(HttpServletRequest request, @RequestBody RequestUser requestUser){
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
         if(userUid.equals(null))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseUser());
         if(requestUser.getPhoneNum().equals(null) || requestUser.getPassword().equals(null))
@@ -168,11 +166,11 @@ public class UserController {
     }
 
     @PostMapping("/autologin")
-    public ResponseEntity autoLogin(@RequestHeader("userToken") String userToken , HttpServletResponse response){
-        DecodeUserToken decodeUserToken = new DecodeUserToken();
+    public ResponseEntity autoLogin(HttpServletRequest request, HttpServletResponse response){
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        String userUid = decodeUserToken.getUserUidByUserToken(userToken, env);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
         if(userUid.equals(null))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseUser());
         UserDto userDto = new UserDto();
