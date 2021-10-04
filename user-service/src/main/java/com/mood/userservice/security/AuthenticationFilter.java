@@ -71,6 +71,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         ResponseUser responseUser = mapper.map(userDetails, ResponseUser.class);
+
         response.addHeader("userToken", token);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String result = objectMapper.writeValueAsString(responseUser);
+        response.getWriter().write(result);
     }
 }

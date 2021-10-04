@@ -31,12 +31,17 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
                 .addFilter(getAuthenticationFilter());
+//                .formLogin().successHandler(getLoginSuccessHandler());
         http.headers().frameOptions().disable();
     }
 
     private AuthenticationFilter getAuthenticationFilter() throws Exception{
         AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager(), userService, env);
         return authenticationFilter;
+    }
+    private LoginSuccessHandler getLoginSuccessHandler() throws Exception{
+        LoginSuccessHandler loginSuccessHandler = new LoginSuccessHandler(userService, env);
+        return loginSuccessHandler;
     }
 
     //인증에 관련된 부분

@@ -1,6 +1,7 @@
 package com.mood.userservice.service;
 
 import com.mood.userservice.dto.UserGradeDto;
+import com.mood.userservice.jpa.UserEntity;
 import com.mood.userservice.jpa.UserGradeEntity;
 import com.mood.userservice.jpa.UserGradeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -45,5 +48,14 @@ public class UserGradeServiceImpl implements UserGradeService{
         userGradeEntity.setDisabled(true);
         userGradeRepository.save(userGradeEntity);
         return true;
+    }
+
+    @Override
+    public List<UserGradeEntity> getUserGrade() {
+        Iterable<UserGradeEntity> iterable = userGradeRepository.findAll();
+        List<UserGradeEntity> list = new ArrayList<>();
+        iterable.forEach(v->
+                list.add(new ModelMapper().map(v, UserGradeEntity.class)));
+        return list;
     }
 }

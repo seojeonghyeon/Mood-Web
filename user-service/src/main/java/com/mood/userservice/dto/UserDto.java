@@ -1,5 +1,6 @@
 package com.mood.userservice.dto;
 
+import com.mood.userservice.jpa.UserEntity;
 import com.mood.userservice.vo.ResponseMatchingUser;
 import com.mood.userservice.vo.ResponsePost;
 import lombok.Data;
@@ -112,4 +113,26 @@ public class UserDto {
 
     //User's Posts
     private List<ResponsePost> PostArticles;
+
+    public void settingUserDto(UserEntity userEntity){
+        this.email=userEntity.getEmail();
+        this.nickname=userEntity.getNickname();
+        this.password=userEntity.getEncryptedPwd();
+        this.phoneNum=userEntity.getPhoneNum();
+        this.birthdate=userEntity.getBirthdate();
+        this.profileImage=userEntity.getProfileImage();
+        this.profileImageIcon=userEntity.getProfileImageIcon();
+        this.coin=userEntity.getCoin();
+        this.ticket=userEntity.getTicket();
+        this.loginCount=userEntity.getLoginCount();
+        this.createTimeAt=userEntity.getCreateTimeAt();
+        this.recentLoginTime=userEntity.getRecentLoginTime();
+        this.matchingTime=userEntity.getMatchingTime();
+        this.nextMatchingTime=userEntity.getNextMatchingTime();
+        this.resetMatching = userEntity.isResetMatching();
+        this.creditPwd = userEntity.getCreditPwd();
+        this.creditEnabled=userEntity.isCreditEnabled();
+        this.userLock=userEntity.isUserLock();
+        this.disabled=userEntity.isDisabled();
+    }
 }

@@ -1,22 +1,30 @@
 package com.mood.userservice.service;
 
 import com.mood.userservice.dto.UserDto;
+import com.mood.userservice.jpa.UserEntity;
+import com.mood.userservice.jpa.UserGradeEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
+import java.util.List;
 
 public interface UserService extends UserDetailsService {
     UserDto createUser(UserDto userDto);
     UserDto getUserDetailsByEmail(String userName);
     boolean checkUserEmail(UserDto userDto);
-    boolean checkUserPhoneNumber(UserDto userDto);
     String getEmailByPhoneNum(UserDto userDto);
     boolean getCertification(UserDto userDto);
     void sendRegistCreditNumber(String phoneNum, String hashkey);
     boolean checkRegistCertification(String phoneNum, String numberId);
-    void sendCreditNumber(String phoneNum, String hashkey);
+    boolean sendCreditNumber(String phoneNum, String hashkey);
     boolean resetPassword(UserDto userDto);
-    UserDto getUserInfo(UserDto userDto);
+    UserDto getUserInfo(String userUid);
     boolean findByUserUid(String userUid);
     boolean checkRegistCertificationIsTrue(String phoneNum);
     boolean updateUserLock(String userUid, boolean lockBoolean);
+    boolean checkCertification(String phoneNum, String numberId);
+    String findByUserUid(String email, String phoneNum);
+    void updateVIPCoin(UserEntity userEntity, int coin);
+    UserGradeEntity getVIPType();
+    List<UserEntity> getUserGrade(UserGradeEntity userGradeEntity);
 }

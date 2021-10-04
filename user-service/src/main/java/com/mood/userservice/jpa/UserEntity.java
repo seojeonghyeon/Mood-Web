@@ -42,6 +42,15 @@ public class UserEntity {
     private String profileImageIcon;
 
     @Column(nullable = false)
+    private String userGrade;
+
+    @Column(nullable = false)
+    private LocalDateTime gradeStart;
+
+    @Column(nullable = true)
+    private LocalDateTime gradeEnd;
+
+    @Column(nullable = false)
     private int coin;
 
     @Column(nullable = false)
@@ -70,6 +79,9 @@ public class UserEntity {
 
     @Column(nullable = false)
     private boolean creditEnabled;
+
+    @Column(nullable = true)
+    private LocalDateTime creditTime;
 
     @Column(nullable = false)
     private boolean userLock;

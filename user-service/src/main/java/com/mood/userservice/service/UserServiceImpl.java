@@ -111,7 +111,10 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> optional = userRepository.findByEmail(email);
         if(optional.isPresent()) {
             UserEntity userEntity = optional.get();
-            UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
+            Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(userEntity.getUserUid());
+            UserDetailEntity userDetailEntity = optionalUserDetailEntity.get();
+            UserDto userDto = new ModelMapper().map(userDetailEntity, UserDto.class);
+            userDto.settingUserDto(userEntity);
             return userDto;
         } else {
             throw new UsernameNotFoundException(email);
@@ -126,15 +129,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean checkUserPhoneNumber(UserDto userDto) {
-        Optional<UserEntity> optional = userRepository.findByPhoneNum(userDto.getPhoneNum());
-        if(optional.isPresent()) return true;
-        else return false;
-    }
-
-    @Override
     public String getEmailByPhoneNum(UserDto userDto) {
-        Optional<UserEntity> optional = userRepository.findByCreditEnabledAndPhoneNum(true, userDto.getPhoneNum());
+        Optional<UserEntity> optional = userRepository.findByCreditEnabledAndPhoneNum(false, userDto.getPhoneNum());
         if(optional.isPresent()) {
             UserEntity userEntity = optional.get();
             return userEntity.getEmail();
@@ -148,10 +144,12 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> optional = userRepository.findByPhoneNum(userDto.getPhoneNum());
         if(optional.isPresent()) {
             UserEntity userEntity = optional.get();
-            return userEntity.isCreditEnabled();
-        } else {
-            return false;
+            if(LocalDateTime.now().isBefore(userEntity.getCreditTime().plusMinutes(30))){
+                if(!userEntity.isCreditEnabled())
+                    return true;
+            }
         }
+        return false;
     }
     @Override
     public void sendRegistCreditNumber(String phoneNum, String hashkey) {
@@ -229,16 +227,73 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void sendCreditNumber(String phoneNum, String hashkey) {
+    public boolean checkCertification(String phoneNum, String numberId) {
+        Optional<UserEntity> optional = userRepository.findTop1ByPhoneNumOrderByRecentLoginTime(phoneNum);
+        if(optional.isPresent()) {
+            UserEntity userEntity = optional.get();
+            if(userEntity.getCreditNumber()==Integer.parseInt(numberId)) {
+                optional.ifPresent(selectUser ->{
+                            selectUser.setCreditEnabled(false);
+                            userRepository.save(selectUser);
+                        });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String findByUserUid(String email, String phoneNum) {
+        Optional<UserEntity> optional = userRepository.findByEmailAndPhoneNum(email, phoneNum);
+        if(optional.isPresent()){
+            UserEntity userEntity = optional.get();
+            return userEntity.getUserUid();
+        }
+        return "";
+    }
+
+    @Override
+    public void updateVIPCoin(UserEntity userEntity, int coin) {
+        Optional<UserEntity> optional = userRepository.findByUserUid(userEntity.getUserUid());
+        optional.ifPresent(selectUser ->{
+            selectUser.setCoin(userEntity.getCoin()+coin);
+            userRepository.save(selectUser);
+        });
+    }
+
+    @Override
+    public UserGradeEntity getVIPType() {
+        return userGradeRepository.findByGradeType("VIP");
+    }
+
+    @Override
+    public List<UserEntity> getUserGrade(UserGradeEntity userGradeEntity) {
+        Optional<Iterable<UserEntity>> optional = userRepository.findByUserGrade(userGradeEntity.getGradeUid());
+        if(optional.isPresent()){
+            Iterable<UserEntity> iterable = optional.get();
+            List<UserEntity> list = new ArrayList<>();
+            iterable.forEach(v->
+                    list.add(new ModelMapper().map(v, UserEntity.class)));
+            return list;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean sendCreditNumber(String phoneNum, String hashkey) {
         int randomNumber = messageService.createRandomNumber();
         String message = " <#> [Mood] 본인인증 번호는 ["+randomNumber+"] 입니다. "+hashkey+"  ";
-        messageService.sendMessage(message, phoneNum);
-        Optional<UserEntity> optional = userRepository.findByPhoneNum(phoneNum);
+        Optional<UserEntity> optional = userRepository.findTop1ByPhoneNumOrderByRecentLoginTime(phoneNum);
         if(optional.isPresent()) {
             UserEntity userEntity = optional.get();
             userEntity.setCreditNumber(randomNumber);
+            userEntity.setCreditEnabled(true);
+            userEntity.setCreditTime(LocalDateTime.now());
             userRepository.save(userEntity);
+            messageService.sendMessage(message, phoneNum);
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -264,22 +319,23 @@ public class UserServiceImpl implements UserService {
         return LocalDateTime.now().getYear()-birthdate.getYear();
     }
 
-    public UserDto getUserInfo(UserDto userDto){
+    @Override
+    public UserDto getUserInfo(String userUid){
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        Optional<UserEntity> optional = userRepository.findByUserUid(userDto.getUserUid());
+        Optional<UserEntity> optional = userRepository.findByUserUid(userUid);
         if(optional.isPresent()) {
             UserEntity getUserEntity = optional.get();
-            if(userDto.isUserLock()){
+            if(getUserEntity.isUserLock()){
                 UserDto lockUserDto = new UserDto();
-                lockUserDto.setUserUid(userDto.getUserUid());
-                lockUserDto.setEmail(userDto.getEmail());
+                lockUserDto.setUserUid(getUserEntity.getUserUid());
+                lockUserDto.setEmail(getUserEntity.getEmail());
                 lockUserDto.setUserLock(true);
                 //신고사유 담기-> 신고서비스 구현 필요
                 log.info("Before call lock microservice");
                 CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
                 RequestLockUser requestLockUser = new RequestLockUser();
-                requestLockUser.setLockUserUid(userDto.getUserUid());
+                requestLockUser.setLockUserUid(getUserEntity.getUserUid());
                 List<ResponseLockUser> lockUserList = circuitBreaker.run(()->lockServiceClient.getLockUser(requestLockUser),
                         throwable -> new ArrayList<>());
                 log.info("After called lock microservice");
@@ -291,21 +347,21 @@ public class UserServiceImpl implements UserService {
                 lockUserDto.setUserLockReasons(lockReason);
                 return lockUserDto;
             }
-            if(userDto.isDisabled()){
+            if(getUserEntity.isDisabled()){
                 UserDto disabledUserDto = new UserDto();
-                disabledUserDto.setUserUid(userDto.getUserUid());
-                disabledUserDto.setEmail(userDto.getEmail());
+                disabledUserDto.setUserUid(getUserEntity.getUserUid());
+                disabledUserDto.setEmail(getUserEntity.getEmail());
                 disabledUserDto.setDisabled(true);
                 return disabledUserDto;
             }
-            if(userDto.isCreditEnabled()){
-                userDto.setCreditEnabled(false);
+            if(getUserEntity.isCreditEnabled()){
+                getUserEntity.setCreditEnabled(false);
             }
-            Optional<UserDetailEntity> optionalDetail = userDetailRepository.findByUserUid(userDto.getUserUid());
+            Optional<UserDetailEntity> optionalDetail = userDetailRepository.findByUserUid(userUid);
             UserDetailEntity userDetailEntity = optionalDetail.get();
 
             optional.ifPresent(selectUser ->{
-                selectUser.setLoginCount(userDto.getLoginCount()+1);
+                selectUser.setLoginCount(getUserEntity.getLoginCount()+1);
                 selectUser.setRecentLoginTime(LocalDateTime.now());
                 userRepository.save(selectUser);
             });
@@ -315,6 +371,8 @@ public class UserServiceImpl implements UserService {
             });
             userRepository.save(getUserEntity);
             userDetailRepository.save(userDetailEntity);
+            UserDto userDto = modelMapper.map(userDetailEntity, UserDto.class);
+            userDto.settingUserDto(getUserEntity);
             return userDto;
         }
         return new UserDto();
