@@ -292,4 +292,10 @@ public class UserController {
         }
     }
 
+    @PostMapping("/rateplans/addRatePlan")
+    public ResponseEntity<ResponseUser> addRatePlan(@RequestBody RequestRatePlan requestRatePlan){
+
+
+    }
+
 }

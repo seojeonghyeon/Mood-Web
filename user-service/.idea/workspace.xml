@@ -5,20 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="efc9baa0-36e8-4b6c-a741-42b817a45ce7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/PurchaseDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/PurchaseEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/PurchaseRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/RatePlanEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/RatePlanRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/UserAgeScheduler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestPurchase.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/RatePlanDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/RatePlanService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/RatePlanServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestRatePlan.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/UserGradeScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/UserGradeScheduler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserGradeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserGradeService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserGradeServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserGradeServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,8 +20,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -95,9 +87,9 @@
   </component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
-      <recent name="com.mood.userservice.jpa" />
       <recent name="com.mood.userservice.dto" />
       <recent name="com.mood.userservice.vo" />
+      <recent name="com.mood.userservice.jpa" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java/com/mood/userservice/service" />
@@ -156,7 +148,7 @@
       <workItem from="1631683660561" duration="12867000" />
       <workItem from="1633314195673" duration="663000" />
       <workItem from="1633315125750" duration="26404000" />
-      <workItem from="1633398437217" duration="8728000" />
+      <workItem from="1633398437217" duration="9703000" />
     </task>
     <servers />
   </component>
