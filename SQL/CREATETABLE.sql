@@ -26,7 +26,8 @@ reset_matching boolean not null
 
 create table userdetails(
 id int auto_increment primary key, 
-user_uid varchar(255) not null, user_group integer, 
+user_uid varchar(255) not null, 
+user_group integer, 
 gender boolean not null, 
 otherm boolean default true not null, 
 otherw boolean default true not null, 
@@ -107,5 +108,14 @@ rateplan_id varchar(255) not null,
 rateplan_type varchar(255) not null, 
 product_id varchar(255) not null, 
 months varchar(255) not null,
+disabled boolean not null
+);
+
+create table blockusers(
+id int auto_increment primary key,
+block_uid varchar(255) not null, 
+user_uid varchar(255) not null, 
+phone_num varchar(255) not null, 
+block_time timestamp not null, 
 disabled boolean not null
 );
