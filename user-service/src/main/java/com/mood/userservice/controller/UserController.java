@@ -249,6 +249,23 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
+
+    @PostMapping("/setMatching")
+    public ResponseEntity<ResponseUser> setMatching(HttpServletRequest request, @RequestBody RequestUser requestUser) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
+        if (userUid.equals(null) || !requestUser.getUserUid().equals(userUid))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        UserDto userDto = mapper.map(requestUser, UserDto.class);
+        if(userService.updateUserSettings(userDto)) {
+            userDto = userService.getUser(userDto);
+            ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
+            return ResponseEntity.status(HttpStatus.OK).body(responseUser);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+    }
     //##
     @PostMapping("/usergrade/regist")
     public ResponseEntity<ResponseUser> createUserGrade(@RequestBody RequestUserGrade userGrade){

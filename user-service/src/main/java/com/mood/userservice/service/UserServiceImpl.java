@@ -411,6 +411,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean updateUserSettings(UserDto userDto) {
+        Optional<UserEntity> optionalUserEntity = userRepository.findByUserUid(userDto.getUserUid());
+        if(optionalUserEntity.isPresent()){
+            UserEntity getUserEntity = optionalUserEntity.get();
+            Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(userDto.getUserUid());
+            UserDetailEntity getUserDetailEntity = optionalUserDetailEntity.get();
+            if(!getUserEntity.getPhoneNum().equals(userDto.getPhoneNum())){
+
+            }else if(!getUserEntity.getNickname().equals(userDto.getNickname())){
+
+            }else if(getUserDetailEntity.getMaxDistance()!=userDto.getMaxDistance()){
+
+            }else if(!getUserDetailEntity.getLocation().equals(userDto.getLocation())){
+
+            }else if(!getUserDetailEntity.getSubLocation().equals(userDto.getSubLocation())){
+
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public UserDto getUser(UserDto userDto) {
+        return null;
+    }
+
+    @Override
     public UserDto getUserInfo(String userUid){
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);

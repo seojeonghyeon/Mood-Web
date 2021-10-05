@@ -35,4 +35,6 @@ public interface UserService extends UserDetailsService {
     void updateUserAge(UserDetailEntity userDetailEntity);
     void updateUserGrade(UserEntity userEntity);
     UserDto updateUserGradeVIP(PurchaseDto purchaseDto);
+    boolean updateUserSettings(UserDto userDto);
+    UserDto getUser(UserDto userDto);
 }
