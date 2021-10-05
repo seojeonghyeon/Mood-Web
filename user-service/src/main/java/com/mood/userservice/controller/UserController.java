@@ -3,15 +3,13 @@ package com.mood.userservice.controller;
 import com.mood.userservice.auth.AuthorizationExtractor;
 import com.mood.userservice.auth.BearerAuthConverser;
 import com.mood.userservice.auth.CreateAuthBearerToken;
+import com.mood.userservice.dto.PurchaseDto;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.dto.UserGradeDto;
 import com.mood.userservice.service.MatchingService;
 import com.mood.userservice.service.UserGradeService;
 import com.mood.userservice.service.UserService;
-import com.mood.userservice.vo.RequestUser;
-import com.mood.userservice.vo.RequestUserGrade;
-import com.mood.userservice.vo.ResponseLockUser;
-import com.mood.userservice.vo.ResponseUser;
+import com.mood.userservice.vo.*;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -56,29 +54,29 @@ public class UserController {
 
     //##
     @PostMapping("/sendRegistCertification")
-    public ResponseEntity sendRegistCertification(@RequestBody RequestUser requestUser){
+    public ResponseEntity<ResponseUser> sendRegistCertification(@RequestBody RequestUser requestUser){
         if(requestUser.getPhoneNum().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(requestUser, UserDto.class);
         userService.sendRegistCreditNumber(userDto.getPhoneNum(), requestUser.getHashkey());
-        return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
 
     //##
     @PostMapping("/checkRegistCertification")
-    public ResponseEntity checkRegistCertification(@RequestBody RequestUser requestUser){
+    public ResponseEntity<ResponseUser> checkRegistCertification(@RequestBody RequestUser requestUser){
         if(requestUser.getNumberId().isEmpty() || requestUser.getPhoneNum().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         if(userService.checkRegistCertification(requestUser.getPhoneNum(), requestUser.getNumberId()))
-            return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 
     //##
     @PostMapping("/regist")
-    public ResponseEntity createUser(@RequestBody RequestUser user, HttpServletResponse response){
+    public ResponseEntity<ResponseUser> createUser(@RequestBody RequestUser user, HttpServletResponse response){
         if(user.getEmail().isEmpty()&& user.getPassword().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         }
@@ -101,7 +99,7 @@ public class UserController {
 
     //##
     @PostMapping("/checkEmail")
-    public ResponseEntity checkEmail(@RequestBody RequestUser requestUser){
+    public ResponseEntity<ResponseUser> checkEmail(@RequestBody RequestUser requestUser){
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(requestUser, UserDto.class);
@@ -115,22 +113,22 @@ public class UserController {
 
     //##
     @PostMapping("/sendCertification")
-    public ResponseEntity sendCertification(@RequestBody RequestUser requestUser){
+    public ResponseEntity<ResponseUser> sendCertification(@RequestBody RequestUser requestUser){
         if(requestUser.getPhoneNum().isEmpty() || requestUser.getHashkey().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         if(userService.sendCreditNumber(requestUser.getPhoneNum(), requestUser.getHashkey()))
-            return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
         else
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 
     //##
     @PostMapping("/certificateNumber")
-    public ResponseEntity certificateNumber(@RequestBody RequestUser requestUser){
+    public ResponseEntity<ResponseUser> certificateNumber(@RequestBody RequestUser requestUser){
         if(requestUser.getPhoneNum().isEmpty() || requestUser.getNumberId().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         if(userService.checkCertification(requestUser.getPhoneNum(), requestUser.getNumberId()))
-            return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
         else
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
@@ -138,7 +136,7 @@ public class UserController {
 
     //##
     @PostMapping("/findByEmail")
-    public ResponseEntity findByEmail(@RequestBody RequestUser requestUser){
+    public ResponseEntity<ResponseUser> findByEmail(@RequestBody RequestUser requestUser){
         if(requestUser.getPhoneNum().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         ModelMapper mapper = new ModelMapper();
@@ -154,7 +152,7 @@ public class UserController {
 
     //##
     @PostMapping("/findByPassword")
-    public ResponseEntity findByPassword(@RequestBody RequestUser requestUser, HttpServletResponse response){
+    public ResponseEntity<ResponseUser> findByPassword(@RequestBody RequestUser requestUser, HttpServletResponse response){
         if(requestUser.getPhoneNum().isEmpty() || requestUser.getEmail().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         ModelMapper mapper = new ModelMapper();
@@ -164,14 +162,14 @@ public class UserController {
             String token = new CreateAuthBearerToken().createToken(env, userService.findByUserUid(requestUser.getEmail(),
                     requestUser.getPhoneNum()));
             response.addHeader("userToken", token);
-            return ResponseEntity.status(HttpStatus.OK).body(new RequestUser());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseUser());
     }
 
     //##
     @PostMapping("/resetPassword")
-    public ResponseEntity resetPassword(HttpServletRequest request, @RequestBody RequestUser requestUser){
+    public ResponseEntity<ResponseUser> resetPassword(HttpServletRequest request, @RequestBody RequestUser requestUser){
         if(requestUser.getEmail().isEmpty() || requestUser.getPhoneNum().isEmpty() || requestUser.getPassword().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
@@ -188,7 +186,7 @@ public class UserController {
 
     //##
     @PostMapping("/autologin")
-    public ResponseEntity autoLogin(HttpServletRequest request, HttpServletResponse response){
+    public ResponseEntity<ResponseUser> autoLogin(HttpServletRequest request, HttpServletResponse response){
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
@@ -205,7 +203,7 @@ public class UserController {
     }
 
     @PostMapping("/getUser")
-    public ResponseEntity getUser(HttpServletRequest request, @RequestBody RequestUser requestUser) {
+    public ResponseEntity<ResponseUser> getUser(HttpServletRequest request, @RequestBody RequestUser requestUser) {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
@@ -224,9 +222,26 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 
+    @PostMapping("/purchaseVIP")
+    public ResponseEntity<ResponseUser> purchaseVIP(HttpServletRequest request, @RequestBody RequestPurchase requestPurchase) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
+        if (userUid.equals(null))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        if(requestPurchase.isAcknowledged() && (requestPurchase.getPurchaseState()==1)){
+            PurchaseDto purchaseDto = mapper.map(requestPurchase, PurchaseDto.class);
+            purchaseDto.setUserUid(userUid);
+            UserDto userDto = userService.updateUserGradeVIP(purchaseDto);
+            ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
+            return ResponseEntity.status(HttpStatus.OK).body(responseUser);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+    }
     //##
     @PostMapping("/usergrade/regist")
-    public ResponseEntity createUserGrade(@RequestBody RequestUserGrade userGrade){
+    public ResponseEntity<ResponseUser> createUserGrade(@RequestBody RequestUserGrade userGrade){
         if(userGrade.getGradeType().isEmpty() || userGrade.getGradePercent().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         ModelMapper modelMapper = new ModelMapper();
@@ -239,7 +254,7 @@ public class UserController {
     }
 
     @PostMapping("/usergrade/disabled")
-    public ResponseEntity disabledUserGrade(@RequestBody RequestUserGrade userGrade){
+    public ResponseEntity<ResponseUser> disabledUserGrade(@RequestBody RequestUserGrade userGrade){
         if(userGrade.getGradeType().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         ModelMapper modelMapper = new ModelMapper();

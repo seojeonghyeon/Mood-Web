@@ -1,6 +1,8 @@
 package com.mood.userservice.service;
 
+import com.mood.userservice.dto.PurchaseDto;
 import com.mood.userservice.dto.UserDto;
+import com.mood.userservice.jpa.UserDetailEntity;
 import com.mood.userservice.jpa.UserEntity;
 import com.mood.userservice.jpa.UserGradeEntity;
 import org.springframework.security.core.userdetails.User;
@@ -27,4 +29,10 @@ public interface UserService extends UserDetailsService {
     void updateVIPCoin(UserEntity userEntity, int coin);
     UserGradeEntity getVIPType();
     List<UserEntity> getUserGrade(UserGradeEntity userGradeEntity);
+    int updateUserAge(UserDto userDto);
+    int updateUserAge(String birth);
+    List<UserDetailEntity> getByAll();
+    void updateUserAge(UserDetailEntity userDetailEntity);
+    void updateUserGrade(UserEntity userEntity);
+    UserDto updateUserGradeVIP(PurchaseDto purchaseDto);
 }

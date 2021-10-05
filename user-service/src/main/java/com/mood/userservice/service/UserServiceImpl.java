@@ -1,6 +1,7 @@
 package com.mood.userservice.service;
 import com.mood.userservice.client.LockServiceClient;
 import com.mood.userservice.dto.CertificationNumberDto;
+import com.mood.userservice.dto.PurchaseDto;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.jpa.*;
 import com.mood.userservice.service.classification.UserGroup;
@@ -27,6 +28,8 @@ import java.util.*;
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
+    private final String VIP = "VIP";
+
     UserRepository userRepository;
     BCryptPasswordEncoder passwordEncoder;
     Environment env;
@@ -37,13 +40,18 @@ public class UserServiceImpl implements UserService {
     TotalUserRepository totalUserRepository;
     CertificationNumberRepository certificationNumberRepository;
     LockServiceClient lockServiceClient;
+    UserGradeService userGradeService;
+    RatePlanRepository ratePlanRepository;
+    PurchaseRepository purchaseRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
                            Environment env, CircuitBreakerFactory circuitBreakerFactory, MessageService messageService,
                            UserGradeRepository userGradeRepository, UserDetailRepository userDetailRepository,
                            TotalUserRepository totalUserRepository,
-                           CertificationNumberRepository certificationNumberRepository, LockServiceClient lockServiceClient){
+                           CertificationNumberRepository certificationNumberRepository, LockServiceClient lockServiceClient,
+                            UserGradeService userGradeService, RatePlanRepository ratePlanRepository,
+                           PurchaseRepository purchaseRepository){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.env=env;
@@ -54,6 +62,9 @@ public class UserServiceImpl implements UserService {
         this.totalUserRepository=totalUserRepository;
         this.certificationNumberRepository= certificationNumberRepository;
         this.lockServiceClient=lockServiceClient;
+        this.userGradeService=userGradeService;
+        this.ratePlanRepository=ratePlanRepository;
+        this.purchaseRepository=purchaseRepository;
     }
 
     @Override
@@ -66,6 +77,7 @@ public class UserServiceImpl implements UserService {
         userDto.setCreateTimeAt(LocalDateTime.now());
         userDto.setRecentLoginTime(LocalDateTime.now());
         userDto.setGradeStart(LocalDateTime.now());
+        userDto.setGradeEnd(LocalDateTime.now().plusDays(14));
         userDto.setUserAge(updateUserAge(userDto));
 
         //check circle grade
@@ -134,9 +146,8 @@ public class UserServiceImpl implements UserService {
         if(optional.isPresent()) {
             UserEntity userEntity = optional.get();
             return userEntity.getEmail();
-        } else {
-            return "";
         }
+        return "";
     }
 
     @Override
@@ -312,11 +323,91 @@ public class UserServiceImpl implements UserService {
         }
         return false;
     }
-
+    @Override
     public int updateUserAge(UserDto userDto){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate birthdate = LocalDate.parse(userDto.getBirthdate(),formatter);
         return LocalDateTime.now().getYear()-birthdate.getYear();
+    }
+    @Override
+    public int updateUserAge(String birth){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate birthdate = LocalDate.parse(birth,formatter);
+        return LocalDateTime.now().getYear()-birthdate.getYear();
+    }
+
+    @Override
+    public List<UserDetailEntity> getByAll() {
+        Iterable<UserDetailEntity> userDetailEntities = userDetailRepository.findAll();
+        List<UserDetailEntity> list = new ArrayList<>();
+        userDetailEntities.forEach(v->
+                list.add(new ModelMapper().map(v, UserDetailEntity.class)));
+        return list;
+    }
+
+    @Override
+    public void updateUserAge(UserDetailEntity userDetailEntity) {
+        Optional<UserDetailEntity> optional = userDetailRepository.findByUserUid(userDetailEntity.getUserUid());
+        optional.ifPresent(selectUser->{
+            selectUser.setUserAge(userDetailEntity.getUserAge());
+            userDetailRepository.save(selectUser);
+        });
+    }
+
+    @Override
+    public void updateUserGrade(UserEntity userEntity) {
+        Optional<UserEntity> optionalUserEntity = userRepository.findByUserUid(userEntity.getUserUid());
+        if(optionalUserEntity.isPresent()){
+            Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(userEntity.getUserUid());
+            UserDetailEntity userDetailEntity = optionalUserDetailEntity.get();
+            optionalUserEntity.ifPresent(selectUser->{
+                selectUser.setUserGrade(userEntity.getUserGrade());
+                selectUser.setGradeStart(userEntity.getGradeStart());
+                selectUser.setGradeEnd(userEntity.getGradeEnd());
+                selectUser.setLoginCount(userEntity.getLoginCount());
+                userRepository.save(selectUser);
+            });
+            optionalUserDetailEntity.ifPresent(selectUser->{
+                selectUser.setUserGrade(userEntity.getUserGrade());
+                selectUser.setGradeStart(userEntity.getGradeStart());
+                selectUser.setGradeEnd(userEntity.getGradeEnd());
+                userDetailRepository.save(selectUser);
+            });
+        }
+    }
+
+    @Override
+    public UserDto updateUserGradeVIP(PurchaseDto purchaseDto) {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Optional<UserEntity> optionalUserEntity = userRepository.findByUserUid(purchaseDto.getUserUid());
+        if(optionalUserEntity.isPresent()){
+            Iterable<RatePlanEntity> ratePlanEntities = ratePlanRepository.findAll();
+            List<RatePlanEntity> list = new ArrayList<>();
+            ratePlanEntities.forEach(v->
+                    list.add(new ModelMapper().map(v, RatePlanEntity.class)));
+            for(RatePlanEntity ratePlanEntity : list){
+                if(ratePlanEntity.getProductId().equals(purchaseDto.getProductId())){
+                    optionalUserEntity.ifPresent(selectUser->{
+                        selectUser.setUserGrade(userGradeService.getUserGrade(VIP));
+                        selectUser.setGradeStart(LocalDateTime.now());
+                        selectUser.setGradeEnd(LocalDateTime.now().plusMonths(ratePlanEntity.getMonths()));
+                        userRepository.save(selectUser);
+                    });
+                    Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(purchaseDto.getUserUid());
+                    optionalUserDetailEntity.ifPresent(selectUser->{
+                        selectUser.setUserGrade(userGradeService.getUserGrade(VIP));
+                        selectUser.setGradeStart(LocalDateTime.now());
+                        selectUser.setGradeEnd(LocalDateTime.now().plusMonths(ratePlanEntity.getMonths()));
+                        userDetailRepository.save(selectUser);
+                    });
+                }
+            }
+        }
+        PurchaseEntity purchaseEntity = modelMapper.map(purchaseDto, PurchaseEntity.class);
+        purchaseEntity.setPurchaseUId(UUID.randomUUID().toString());
+        purchaseRepository.save(purchaseEntity);
+        return null;
     }
 
     @Override

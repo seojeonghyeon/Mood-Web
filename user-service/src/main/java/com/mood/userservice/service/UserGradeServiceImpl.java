@@ -58,4 +58,9 @@ public class UserGradeServiceImpl implements UserGradeService{
                 list.add(new ModelMapper().map(v, UserGradeEntity.class)));
         return list;
     }
+
+    @Override
+    public String getUserGrade(String userGradeType) {
+        return userGradeRepository.findByGradeType(userGradeType).getGradeUid();
+    }
 }
