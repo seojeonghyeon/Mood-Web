@@ -2,8 +2,10 @@ package com.mood.userservice.jpa;
 
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface BlockUserRepository extends CrudRepository<BlockUserEntity, Long> {
-    List<BlockUserEntity> findDistinctByUserUidAndDisabled(String UserUid, boolean disabled);
+    Iterable<BlockUserEntity> findDistinctByUserUidAndDisabled(String UserUid, boolean disabled);
+    Optional<Iterable<BlockUserEntity>> findByUserUid(String userUid);
+    Optional<BlockUserEntity> findByUserUidAndPhoneNum(String userUid, String phoneNum);
 }

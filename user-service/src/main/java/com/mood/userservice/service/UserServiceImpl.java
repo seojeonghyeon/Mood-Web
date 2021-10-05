@@ -355,7 +355,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserGrade(UserEntity userEntity) {
+    public void updateUserGrade(UserEntity userEntity, boolean vipDown) {
         Optional<UserEntity> optionalUserEntity = userRepository.findByUserUid(userEntity.getUserUid());
         if(optionalUserEntity.isPresent()){
             Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(userEntity.getUserUid());
@@ -371,6 +371,11 @@ public class UserServiceImpl implements UserService {
                 selectUser.setUserGrade(userEntity.getUserGrade());
                 selectUser.setGradeStart(userEntity.getGradeStart());
                 selectUser.setGradeEnd(userEntity.getGradeEnd());
+                if(vipDown){
+                    selectUser.setSubLocation(null);
+                    selectUser.setSubLatitude(0.0);
+                    selectUser.setSubLongitude(0.0);
+                }
                 userDetailRepository.save(selectUser);
             });
         }
@@ -418,22 +423,91 @@ public class UserServiceImpl implements UserService {
             Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(userDto.getUserUid());
             UserDetailEntity getUserDetailEntity = optionalUserDetailEntity.get();
             if(!getUserEntity.getPhoneNum().equals(userDto.getPhoneNum())){
-
-            }else if(!getUserEntity.getNickname().equals(userDto.getNickname())){
-
-            }else if(getUserDetailEntity.getMaxDistance()!=userDto.getMaxDistance()){
-
-            }else if(!getUserDetailEntity.getLocation().equals(userDto.getLocation())){
-
-            }else if(!getUserDetailEntity.getSubLocation().equals(userDto.getSubLocation())){
-
+                if(getUserEntity.getCoin() >= 10){
+                    userDto.setCoin(getUserEntity.getCoin()-10);
+                }else{
+                    userDto.setPhoneNum(getUserEntity.getPhoneNum());
+                }
             }
+            if(!getUserEntity.getNickname().equals(userDto.getNickname())){
+                if(getUserEntity.getCoin() >= 10){
+                    userDto.setCoin(getUserEntity.getCoin()-10);
+                }else{
+                    userDto.setNickname(getUserEntity.getNickname());
+                }
+            }
+            if(getUserDetailEntity.getMaxDistance()!=userDto.getMaxDistance()){
+                if(getUserEntity.getCoin() >= 10){
+                    userDto.setCoin(getUserEntity.getCoin()-10);
+                }else{
+                    userDto.setMaxDistance(getUserDetailEntity.getMaxDistance());
+                }
+            }
+            if(!getUserDetailEntity.getLocation().equals(userDto.getLocation())){
+                if(getUserEntity.getCoin() >= 10){
+                    userDto.setCoin(getUserEntity.getCoin()-10);
+                }else{
+                    userDto.setLocation(getUserDetailEntity.getLocation());
+                }
+            }
+            if(!getUserDetailEntity.getSubLocation().equals(userDto.getSubLocation())){
+                if(!getUserEntity.getUserGrade().equals(userGradeService.getUserGrade(VIP))){
+                    userDto.setSubLocation(getUserDetailEntity.getSubLocation());
+                    userDto.setSubLatitude(getUserDetailEntity.getSubLatitude());
+                    userDto.setSubLongitude(getUserDetailEntity.getSubLongitude());
+                }
+            }
+            optionalUserEntity.ifPresent(selectUser->{
+                selectUser.setCoin(userDto.getCoin());
+                selectUser.setNickname(userDto.getNickname());
+                selectUser.setPhoneNum(userDto.getPhoneNum());
+                selectUser.setProfileImage(userDto.getProfileImage());
+                selectUser.setProfileImageIcon(userDto.getProfileImageIcon());
+                userRepository.save(selectUser);
+            });
+            optionalUserDetailEntity.ifPresent(selectUser->{
+                selectUser.setOtherW(userDto.isOtherW());
+                selectUser.setOtherM(userDto.isOtherM());
+
+                selectUser.setMaxDistance(userDto.getMaxDistance());
+                selectUser.setMinAge(userDto.getMinAge());
+                selectUser.setMaxAge(userDto.getMaxAge());
+
+                selectUser.setLocation(userDto.getLocation());
+                selectUser.setLatitude(userDto.getLatitude());
+                selectUser.setLongitude(userDto.getLongitude());
+
+                selectUser.setSubLocation(userDto.getSubLocation());
+                selectUser.setSubLongitude(userDto.getSubLongitude());
+                selectUser.setSubLatitude(userDto.getSubLatitude());
+                userDetailRepository.save(selectUser);
+            });
+            return true;
         }
         return false;
     }
 
     @Override
-    public UserDto getUser(UserDto userDto) {
+    public UserDto getUser(String userUid) {
+        Optional<UserEntity> optionalUserEntity = userRepository.findByUserUid(userUid);
+        Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(userUid);
+        if(optionalUserEntity.isPresent()){
+            ModelMapper modelMapper = new ModelMapper();
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+            UserEntity userEntity = optionalUserEntity.get();
+            UserDetailEntity userDetailEntity = optionalUserDetailEntity.get();
+            UserDto userDto = modelMapper.map(userDetailEntity, UserDto.class);
+            userDto.settingUserDto(userEntity);
+            return userDto;
+        }
+        return null;
+    }
+
+    @Override
+    public UserDetailEntity getUserDetail(String userUid) {
+        Optional<UserDetailEntity> optional = userDetailRepository.findByUserUid(userUid);
+        if(optional.isPresent())
+            return optional.get();
         return null;
     }
 

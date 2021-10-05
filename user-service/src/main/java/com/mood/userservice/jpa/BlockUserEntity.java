@@ -20,7 +20,7 @@ public class BlockUserEntity {
     private String userUid;
 
     @Column(nullable = false)
-    private String blockPhoneNum;
+    private String phoneNum;
 
     @Column(nullable = false)
     private LocalDateTime blockTime;

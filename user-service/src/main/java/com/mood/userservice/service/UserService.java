@@ -33,8 +33,10 @@ public interface UserService extends UserDetailsService {
     int updateUserAge(String birth);
     List<UserDetailEntity> getByAll();
     void updateUserAge(UserDetailEntity userDetailEntity);
-    void updateUserGrade(UserEntity userEntity);
+    void updateUserGrade(UserEntity userEntity, boolean vipDown);
     UserDto updateUserGradeVIP(PurchaseDto purchaseDto);
     boolean updateUserSettings(UserDto userDto);
-    UserDto getUser(UserDto userDto);
+    UserDto getUser(String userUid);
+
+    UserDetailEntity getUserDetail(String userUid);
 }

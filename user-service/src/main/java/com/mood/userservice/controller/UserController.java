@@ -260,7 +260,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         UserDto userDto = mapper.map(requestUser, UserDto.class);
         if(userService.updateUserSettings(userDto)) {
-            userDto = userService.getUser(userDto);
+            userDto = userService.getUser(userDto.getUserUid());
             ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
             return ResponseEntity.status(HttpStatus.OK).body(responseUser);
         }
