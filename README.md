@@ -38,7 +38,7 @@ This part is for communication protocol(Android and Back-end Server). Let's see 
 
 ## SQL(MariaDB)
 
->> CREATE TABLES
+
 'create table users( 
 id int auto_increment primary key,
 user_uid varchar(255) not null,
@@ -63,9 +63,9 @@ recent_login_time timestamp not null,
 matching_time timestamp not null, 
 next_matching_time timestamp not null, 
 reset_matching boolean not null
-);
+);'
 
-create table userdetails(
+'create table userdetails(
 id int auto_increment primary key, 
 user_uid varchar(255) not null, user_group integer, 
 gender boolean not null, 
@@ -95,33 +95,33 @@ max_age integer not null,
 min_age integer not null, 
 max_distance integer not null, 
 recent_login_time timestamp not null
-);
+);'
 
-create table usergrades(
+'create table usergrades(
 id int auto_increment primary key,
 disabled boolean not null, 
 grade_date integer not null, 
 grade_percent varchar(255) not null, 
 grade_type varchar(255) not null, 
 grade_uid varchar(255) not null
-);
+);'
 
-create table totalusers (
+'create table totalusers (
 id int auto_increment primary key,
 disabled boolean not null, 
 totaluser integer not null,
 created_at timestamp not null
-);
+);'
 
-create table certifications(
+'create table certifications(
 id int auto_increment primary key, 
 disabled boolean not null, 
 phone_num varchar(255) not null, 
 credit_number integer, 
 created_at timestamp not null
-);
+);'
 
-create table lockusers(
+'create table lockusers(
 id int auto_increment primary key, 
 lock_uid varchar(255) not null,
 lock_user_uid varchar(255) not null,
@@ -131,18 +131,18 @@ refer_uid varchar(255) not null,
 from_user_uid varchar(255) not null,
 lock_user_disabled boolean not null, 
 active_time timestamp not null
-);
+);'
 
-create table rateplans(
+'create table rateplans(
 id int auto_increment primary key,
 rateplan_id varchar(255) not null,
 rateplan_type varchar(255) not null, 
 product_id varchar(255) not null, 
 months varchar(255) not null,
 disabled boolean not null
-);
+);'
 
-create table purchases(
+'create table purchases(
 id int auto_increment primary key,
 rateplan_id varchar(255) not null,
 rateplan_type varchar(255) not null, 
