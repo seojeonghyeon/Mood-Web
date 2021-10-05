@@ -1,8 +1,10 @@
 package com.mood.userservice.service;
 
 import com.mood.userservice.dto.RatePlanDto;
+import com.mood.userservice.jpa.RatePlanEntity;
 
 public interface RatePlanService {
-    boolean addRatePlan(RatePlanDto ratePlanDto);
-    RatePlanDto getRatePlan(String )
+    void addRatePlan(RatePlanDto ratePlanDto);
+    RatePlanDto getRatePlan(String productId);
+    Iterable<RatePlanEntity> getRatePlans();
 }

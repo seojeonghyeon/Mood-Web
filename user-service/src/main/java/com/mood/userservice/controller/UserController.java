@@ -4,9 +4,13 @@ import com.mood.userservice.auth.AuthorizationExtractor;
 import com.mood.userservice.auth.BearerAuthConverser;
 import com.mood.userservice.auth.CreateAuthBearerToken;
 import com.mood.userservice.dto.PurchaseDto;
+import com.mood.userservice.dto.RatePlanDto;
 import com.mood.userservice.dto.UserDto;
 import com.mood.userservice.dto.UserGradeDto;
+import com.mood.userservice.jpa.RatePlanEntity;
+import com.mood.userservice.jpa.UserEntity;
 import com.mood.userservice.service.MatchingService;
+import com.mood.userservice.service.RatePlanService;
 import com.mood.userservice.service.UserGradeService;
 import com.mood.userservice.service.UserService;
 import com.mood.userservice.vo.*;
@@ -23,7 +27,10 @@ import io.jsonwebtoken.Jwts;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/")
@@ -32,14 +39,17 @@ public class UserController {
     private UserService userService;
     private MatchingService matchingService;
     private UserGradeService userGradeService;
+    private RatePlanService ratePlanService;
 
 
     @Autowired
-    public UserController(Environment env, UserService userService, UserGradeService userGradeService, MatchingService matchingService){
+    public UserController(Environment env, UserService userService, UserGradeService userGradeService, MatchingService matchingService,
+                          RatePlanService ratePlanService){
         this.env = env;
         this.userService = userService;
         this.matchingService = matchingService;
         this.userGradeService = userGradeService;
+        this.ratePlanService = ratePlanService;
     }
 
     //Back-end Server, User Service Health Check
@@ -293,9 +303,33 @@ public class UserController {
     }
 
     @PostMapping("/rateplans/addRatePlan")
-    public ResponseEntity<ResponseUser> addRatePlan(@RequestBody RequestRatePlan requestRatePlan){
-
-
+    public ResponseEntity<ResponseRatePlan> addRatePlan(@RequestBody RequestRatePlan requestRatePlan){
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        RatePlanDto ratePlanDto = mapper.map(requestRatePlan, RatePlanDto.class);
+        ratePlanService.addRatePlan(ratePlanDto);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseRatePlan());
     }
 
+    @PostMapping("/rateplans/getRatePlan")
+    public ResponseEntity<ResponseRatePlan> getRatePlan(@RequestBody RequestRatePlan requestRatePlan){
+        if(requestRatePlan.getProductId().isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseRatePlan());
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        RatePlanDto ratePlanDto = ratePlanService.getRatePlan(requestRatePlan.getProductId());
+        ResponseRatePlan responseRatePlan = mapper.map(ratePlanDto, ResponseRatePlan.class);
+        return ResponseEntity.status(HttpStatus.OK).body(responseRatePlan);
+    }
+
+    @PostMapping("/rateplans/addRatePlans")
+    public ResponseEntity<List<ResponseRatePlan>> getRatePlans(){
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Iterable<RatePlanEntity> ratePlanEntities = ratePlanService.getRatePlans();
+        List<ResponseRatePlan> list = new ArrayList<>();
+        ratePlanEntities.forEach(v->
+                list.add(new ModelMapper().map(v, ResponseRatePlan.class)));
+        return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
 }
