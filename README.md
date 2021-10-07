@@ -4,26 +4,26 @@
   
   데이팅 앱(Mood)의 서버(Back-end)관련 개발 소스입니다. 본 코드는 수익과 관련이 있을 수 있으므로 무단 유출과 배포, 사용을 금지합니다.(2021.10.7)
 
-* [Document(Communication Protocol)](#document(communication protocol))
-* Server(AWS:EC2)
-* Docker
-* Mood-Web
-* Config-server
-* Apigateway-server
-* user-service
-* matching-service
-* lock-service
-* post-service
-* SQL(MariaDB)
+* [DOCUMENT](#document)
+* [Server](#server)
+* [Docker](#docker)
+* [Mood-WEB](#mood-web)
+* [CONFIG-SERVER](#config-server)
+* [APIGATEWAY-SERVER](#apigateway-server)
+* [USER-SERVICE](#user-service)
+* [MATCHING-SERVICE](#matching-service)
+* [LOCK-SERVICE](#lock-service)
+* [POST-SERVICE](#post-service)
+* [SQL](#sql)
 
 
-## Document(Communication Protocol)
+## Document
   This part is for communication protocol(Android and Back-end Server). Let's see the document
   ```
   GitHub(Here) : https://github.com/seojeonghyeon/Mood-Web/tree/main/Communication%20Protocol
   ```
 
-## Server(AWS:EC2)
+## Server
 
 1. 서버에 접속 방법
    - Mac OS(Terminal)
