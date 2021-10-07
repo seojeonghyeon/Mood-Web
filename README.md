@@ -20,7 +20,8 @@ This part is for communication protocol(Android and Back-end Server). Let's see 
 ## Server(AWS:EC2)
 
 - 서버 접속 방법
-'sudo ssh -i ServerKey.pem ubuntu@ServerIP'
+
+<code>sudo ssh -i ServerKey.pem ubuntu@ServerIP</code>
 
 
 ## Docker
