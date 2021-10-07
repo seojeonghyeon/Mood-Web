@@ -17,6 +17,9 @@ credit_enabled boolean not null,
 credit_time timestamp,
 credit_number integer, 
 credit_pwd varchar(255), 
+user_grade varchar(255) not null, 
+grade_start timestamp not null, 
+grade_end timestamp not null, 
 login_count integer not null, 
 recent_login_time timestamp not null, 
 matching_time timestamp not null, 
@@ -98,17 +101,21 @@ id int auto_increment primary key,
 rateplan_id varchar(255) not null,
 rateplan_type varchar(255) not null, 
 product_id varchar(255) not null, 
-months varchar(255) not null,
+months int not null,
 disabled boolean not null
 );
 
 create table purchases(
 id int auto_increment primary key,
-rateplan_id varchar(255) not null,
-rateplan_type varchar(255) not null, 
+purchaseuid varchar(255) not null,
+user_uid varchar(255) not null, 
+order_id varchar(255) not null, 
+package_name varchar(255) not null, 
 product_id varchar(255) not null, 
-months varchar(255) not null,
-disabled boolean not null
+purchase_time varchar(255) not null, 
+purchase_state varchar(255) not null, 
+purchase_token varchar(255) not null, 
+acknowledged boolean not null
 );
 
 create table blockusers(

@@ -1,6 +1,8 @@
 server:
   port: 0
-
+token:
+  expiration_time: 864000000
+  secret: mood_user_token
 spring:
   application:
     name: user-service
@@ -10,6 +12,14 @@ spring:
       settings:
         web-allow-others: true
       path: /h2
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/mooddb
+    username: root
+    password: '00000000'
 
 eureka:
   client:
@@ -19,7 +29,10 @@ eureka:
     fetch-registry: true
     instance:
       instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
-
+messaging:
+  apiKey: "NCSU6S4DEQBP1YW0"
+  apiSecret: "UE3SBWDNRGNAC3HBJTSN6FNVYQYNGNFO"
+  fromNumber: "07080283359"
 
 logging:
   level:

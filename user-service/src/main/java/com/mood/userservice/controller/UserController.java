@@ -240,7 +240,8 @@ public class UserController {
         String userUid = bearerAuthConverser.handle(request, env);
         if (userUid.equals(null))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
-        if(requestPurchase.isAcknowledged() && (requestPurchase.getPurchaseState()==1)){
+        if(requestPurchase.isAcknowledged() && (requestPurchase.getPurchaseState()==0)){
+            log.info("" + requestPurchase);
             PurchaseDto purchaseDto = mapper.map(requestPurchase, PurchaseDto.class);
             purchaseDto.setUserUid(userUid);
             UserDto userDto = userService.updateUserGradeVIP(purchaseDto);
@@ -256,9 +257,11 @@ public class UserController {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
         String userUid = bearerAuthConverser.handle(request, env);
-        if (userUid.equals(null) || !requestUser.getUserUid().equals(userUid))
+        if (userUid.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         UserDto userDto = mapper.map(requestUser, UserDto.class);
+        userDto.setUserUid(userUid);
+        log.info(""+userDto);
         if(userService.updateUserSettings(userDto)) {
             userDto = userService.getUser(userDto.getUserUid());
             ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);

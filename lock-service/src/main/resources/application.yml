@@ -10,7 +10,12 @@ spring:
       settings:
         web-allow-others: true
       path: /h2
-
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/mooddb
+    username: root
+    password: 00000000
+#    url: jdbc:mariadb://172.18.0.5:3306/mooddb
 eureka:
   client:
     service-url:

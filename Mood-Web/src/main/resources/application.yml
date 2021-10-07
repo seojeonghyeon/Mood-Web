@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: mood
+  cloud:
+    config:
+      url: http://127.0.0.1:8888
+      name: config-service
 
 eureka:
   client:
