@@ -2,7 +2,8 @@
   Copyright 2021. 서정현, 김일준, Mood All Rights Reserved.
   
   
-  데이팅 앱(Mood)의 서버(Back-end)관련 개발 소스입니다. 본 코드는 수익과 관련이 있을 수 있으므로 무단 유출과 배포, 사용을 금지합니다.(2021.10.7)
+  데이팅 앱(Mood)의 서버(Back-end)관련 개발 진행 중인 소스입니다. 본 코드는 수익과 관련이 있을 수 있으므로 무단 유출과 배포, 사용을 금지합니다.(2021.10.7)
+
 
 * [DOCUMENT](#document)
 * [Server](#server)
