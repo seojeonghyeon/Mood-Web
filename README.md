@@ -88,9 +88,20 @@
      ex) docker build --tag seojeonghyeon0630/user-service:0.0.1 .
      ```
      
-  4. Service File Push
-  5. Service File Pull
-  6. Service File Run
+  3. Service File Push
+     ```
+     docker push seojeonghyeon0630/mood-web:0.0.1
+     ```
+
+
+  4. Service File Pull
+
+
+     ```
+     docker pull seojeonghyeon0630/mood-web:0.0.1
+     ```
+
+  5. Service File Run
 
      Docker Bridge Network 생성(172.18.0.1에서부터 subnet mask를 16으로)
      ```
@@ -178,7 +189,7 @@
      ```
 
 
-  8. Container와 Log를 통한 Service 작동상태 확인
+  6. Container와 Log를 통한 Service 작동상태 확인
      ```
      Docker 이미지 확인 : docker images -a (-a는 전체)
      Docker 컨테이너 확인 : Docker container ls -a
@@ -186,8 +197,9 @@
      Docker 컨테이너를 멈추고 삭제 : docker stop fa7 && docker rm fa7 (다 입력할 필요 없다. 똑똑해)
      Docker 내 안쓰고 있는 데이터들 정리 : docker system prune
      Docker Log 확인 : docker logs fa7
+     Docker Log 지속 확인 : docker -f logs fa7
      ```
-
+    
 
 
 
@@ -212,5 +224,5 @@
 ## post-service
 
 
-## SQL(MariaDB)
+## SQL
 
