@@ -21,7 +21,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/CertificationNumberRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/CertificationNumberRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/PurchaseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/PurchaseRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MessagingService.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MessagingServiceImpl.java" beforeDir="false" />
@@ -165,7 +164,7 @@
       <workItem from="1633398437217" duration="24724000" />
       <workItem from="1633477379168" duration="7405000" />
       <workItem from="1633516213605" duration="11020000" />
-      <workItem from="1633607678999" duration="1209000" />
+      <workItem from="1633607678999" duration="1813000" />
     </task>
     <servers />
   </component>
