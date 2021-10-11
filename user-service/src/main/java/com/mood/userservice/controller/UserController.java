@@ -305,6 +305,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 
+    //##
     @PostMapping("/blockPhoneNums")
     public ResponseEntity<ResponseUser> blockPhoneNums(HttpServletRequest request, @RequestBody List<String> phoneNumList) {
         ModelMapper mapper = new ModelMapper();
@@ -325,8 +326,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 
+    //##
     @PostMapping("/getBlockPhoneNums")
-    public ResponseEntity<List<String>> getBlockPhoneNums(HttpServletRequest request, @RequestBody List<String> phoneNumList) {
+    public ResponseEntity<List<String>> getBlockPhoneNums(HttpServletRequest request) {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
@@ -335,6 +337,19 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
         List<String> list = blockUserService.getBlockUsers(userUid);
         return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
+
+    @PostMapping("/updatePhoneNum")
+    public ResponseEntity<ResponseUser> updatePhoneNum(HttpServletRequest request, @RequestBody RequestUser requestUser) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
+        if (userUid.isEmpty() && requestUser.getPhoneNum().isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        if(userService.updatePhoneNum(userUid, requestUser.getPhoneNum()))
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 
     //##

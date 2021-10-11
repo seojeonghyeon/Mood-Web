@@ -59,14 +59,14 @@ public class BlockUserServiceImpl implements BlockUserService{
                 blockUserRepository.save(blockUserEntity);
             }
         }
-        return false;
+        return true;
     }
 
     public void updateBlockUser(BlockUserDto blockUserDto){
         Optional<BlockUserEntity> optional = blockUserRepository.findByUserUidAndPhoneNum(blockUserDto.getUserUid(), blockUserDto.getPhoneNum());
         optional.ifPresent(selectUser->{
             selectUser.setBlockTime(LocalDateTime.now());
-            selectUser.setDisabled(!blockUserDto.isDisabled());
+            selectUser.setDisabled(!selectUser.isDisabled());
             blockUserRepository.save(selectUser);
         });
     }

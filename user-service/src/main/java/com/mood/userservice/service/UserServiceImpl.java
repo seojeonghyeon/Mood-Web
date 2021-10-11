@@ -91,6 +91,7 @@ public class UserServiceImpl implements UserService {
         userDto.setUserLock(false);
         userDto.setCreditEnabled(false);
         userDto.setResetMatching(true);
+        userDto.setCreditPwd("no pass");
         //set UserGroup
         UserGroup userGroup = new UserGroup(userDetailRepository, totalUserRepository);
         userDto.setUserGroup(userGroup.selectDecisionTree(userDto));
@@ -129,6 +130,26 @@ public class UserServiceImpl implements UserService {
             UserEntity userEntity = optional.get();
             Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(userEntity.getUserUid());
             UserDetailEntity userDetailEntity = optionalUserDetailEntity.get();
+
+            if(userEntity.isCreditEnabled()){
+                userEntity.setCreditEnabled(false);
+                userEntity.setCreditPwd("no pass");
+            }
+
+            optional.ifPresent(selectUser ->{
+                LocalDate currentDate = LocalDate.now();
+                LocalDate recentLoginTime = selectUser.getRecentLoginTime().toLocalDate();
+                if(recentLoginTime.compareTo(currentDate) < 0)
+                    selectUser.setLoginCount(userEntity.getLoginCount()+1);
+                selectUser.setRecentLoginTime(LocalDateTime.now());
+                userRepository.save(selectUser);
+            });
+            optionalUserDetailEntity.ifPresent(selectUser ->{
+                selectUser.setRecentLoginTime(LocalDateTime.now());
+                userDetailRepository.save(selectUser);
+            });
+
+
             UserDto userDto = new ModelMapper().map(userDetailEntity, UserDto.class);
             userDto.settingUserDto(userEntity);
             return userDto;
@@ -216,9 +237,10 @@ public class UserServiceImpl implements UserService {
                         certificationNumberRepository.save(selectUser);
                     });
                     return true;
-                }else return false;
-            }else return false;
-        }else  return false;
+                }
+            }
+        }
+        return false;
     }
     @Override
     public boolean checkRegistCertificationIsTrue(String phoneNum) {
@@ -254,6 +276,7 @@ public class UserServiceImpl implements UserService {
             if(userEntity.getCreditNumber()==Integer.parseInt(numberId)) {
                 optional.ifPresent(selectUser ->{
                             selectUser.setCreditEnabled(false);
+                            selectUser.setCreditPwd("pass");
                             userRepository.save(selectUser);
                         });
                 return true;
@@ -317,11 +340,15 @@ public class UserServiceImpl implements UserService {
         String message = " <#> [Mood] 본인인증 번호는 ["+randomNumber+"] 입니다. "+hashkey+"  ";
         Optional<UserEntity> optional = userRepository.findTop1ByPhoneNumOrderByRecentLoginTime(phoneNum);
         if(optional.isPresent()) {
-            UserEntity userEntity = optional.get();
-            userEntity.setCreditNumber(randomNumber);
-            userEntity.setCreditEnabled(true);
-            userEntity.setCreditTime(LocalDateTime.now());
-            userRepository.save(userEntity);
+            optional.ifPresent(
+                    selectUser->{
+                        selectUser.setCreditNumber(randomNumber);
+                        selectUser.setCreditEnabled(true);
+                        selectUser.setCreditTime(LocalDateTime.now());
+                        selectUser.setCreditPwd("no pass");
+                        userRepository.save(selectUser);
+                    }
+            );
             messageService.sendMessage(message, phoneNum);
             return true;
         }
@@ -444,11 +471,7 @@ public class UserServiceImpl implements UserService {
             Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(userDto.getUserUid());
             UserDetailEntity getUserDetailEntity = optionalUserDetailEntity.get();
             if(!getUserEntity.getPhoneNum().equals(userDto.getPhoneNum())){
-                if(getUserEntity.getCoin() >= 10){
-                    getUserEntity.setCoin(getUserEntity.getCoin()-10);
-                }else{
-                    userDto.setPhoneNum(getUserEntity.getPhoneNum());
-                }
+                userDto.setPhoneNum(getUserEntity.getPhoneNum());
             }
             if(!getUserEntity.getNickname().equals(userDto.getNickname())){
                 if(getUserEntity.getCoin() >= 10){
@@ -543,6 +566,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean updatePhoneNum(String userUid, String phoneNum) {
+        Optional<UserEntity> optional = userRepository.findByUserUid(userUid);
+        if(optional.isPresent()){
+            UserEntity userEntity = optional.get();
+            if((userEntity.getCreditPwd().equals("pass")) && (LocalDateTime.now().isBefore(userEntity.getCreditTime().plusMinutes(10))) && (userEntity.getCoin()>=10)){
+                optional.ifPresent(selectUser->{
+                    selectUser.setCoin(selectUser.getCoin()-10);
+                    selectUser.setPhoneNum(phoneNum);
+                    userEntity.setCreditPwd("no pass");
+                    userRepository.save(userEntity);
+                });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public UserDto getUserInfo(String userUid){
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -579,12 +620,16 @@ public class UserServiceImpl implements UserService {
             }
             if(getUserEntity.isCreditEnabled()){
                 getUserEntity.setCreditEnabled(false);
+                getUserEntity.setCreditPwd("no pass");
             }
             Optional<UserDetailEntity> optionalDetail = userDetailRepository.findByUserUid(userUid);
             UserDetailEntity userDetailEntity = optionalDetail.get();
 
             optional.ifPresent(selectUser ->{
-                selectUser.setLoginCount(getUserEntity.getLoginCount()+1);
+                LocalDate currentDate = LocalDate.now();
+                LocalDate recentLoginTime = selectUser.getRecentLoginTime().toLocalDate();
+                if(recentLoginTime.compareTo(currentDate) < 0)
+                    selectUser.setLoginCount(getUserEntity.getLoginCount()+1);
                 selectUser.setRecentLoginTime(LocalDateTime.now());
                 userRepository.save(selectUser);
             });
@@ -592,8 +637,6 @@ public class UserServiceImpl implements UserService {
                 selectUser.setRecentLoginTime(LocalDateTime.now());
                 userDetailRepository.save(selectUser);
             });
-            userRepository.save(getUserEntity);
-            userDetailRepository.save(userDetailEntity);
             UserDto userDto = modelMapper.map(userDetailEntity, UserDto.class);
             userDto.settingUserDto(getUserEntity);
             userDto.setUserGrade(userGradeService.printUserGrade(userDto.getUserGrade()));

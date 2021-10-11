@@ -5,6 +5,7 @@ import com.mood.userservice.jpa.UserEntity;
 import com.mood.userservice.jpa.UserGradeEntity;
 import com.mood.userservice.service.UserGradeService;
 import com.mood.userservice.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Component
 public class UserGradeScheduler {
 
@@ -33,6 +35,7 @@ public class UserGradeScheduler {
     @Scheduled(cron = "0 20 0 * * *")
     public void updateUserGrade(){
         boolean vipDown = false;
+        log.info("Before update user's grade : "+LocalDateTime.now());
         List<UserGradeEntity> listUserGrade = userGradeService.getUserGrade();
         for (UserGradeEntity userGradeEntity : listUserGrade){
             List<UserEntity> listUser = userService.getUserGrade(userGradeEntity);
@@ -72,5 +75,6 @@ public class UserGradeScheduler {
                 }
             }
         }
+        log.info("After update user's grade : "+LocalDateTime.now());
     }
 }

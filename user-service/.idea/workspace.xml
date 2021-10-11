@@ -5,39 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="efc9baa0-36e8-4b6c-a741-42b817a45ce7" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).docx" beforeDir="false" afterPath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).pdf" beforeDir="false" afterPath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SQL/CREATETABLE.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../SQL/CREATETABLE.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apigateway-service/src/main/java/com/mood/apigatewayservice/filter/AuthorizationHeaderFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apigateway-service/src/main/java/com/mood/apigatewayservice/filter/AuthorizationHeaderFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apigateway-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../apigateway-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../config-service/src/main/resources/bootstrap.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../config-service/src/main/resources/bootstrap.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../docker-files/kafka-docker" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-files/kafka-docker" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/UserServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/UserServiceApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/CertificationNumberDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/CertificationNumberDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/UserDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/BlockUserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/BlockUserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/CertificationNumberEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/CertificationNumberEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserDetailEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserDetailEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/security/AuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/security/AuthenticationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/security/WebSecurity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/security/WebSecurity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/BlockUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/BlockUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/UserGradeScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/UserGradeScheduler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/VIPScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/VIPScheduler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/BlockUserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/BlockUserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MessageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MessageServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserGradeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserGradeService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserGradeServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserGradeServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/clustering/UserGroupClustering.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestMatchingUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestMatchingUser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestUser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/ResponseMatchingUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/ResponseMatchingUser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/ResponsePost.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/ResponsePost.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/ResponseUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/ResponseUser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -180,7 +155,7 @@
       <workItem from="1633752167855" duration="7528000" />
       <workItem from="1633849425597" duration="2826000" />
       <workItem from="1633871246225" duration="1098000" />
-      <workItem from="1633928186719" duration="2699000" />
+      <workItem from="1633928186719" duration="16755000" />
     </task>
     <servers />
   </component>
