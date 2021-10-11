@@ -13,7 +13,7 @@ import java.util.List;
 public interface UserService extends UserDetailsService {
     UserDto createUser(UserDto userDto);
     UserDto getUserDetailsByEmail(String userName);
-    boolean checkUserEmail(UserDto userDto);
+    boolean checkUserEmail(String email);
     String getEmailByPhoneNum(UserDto userDto);
     boolean getCertification(UserDto userDto);
     void sendRegistCreditNumber(String phoneNum, String hashkey);
@@ -29,6 +29,8 @@ public interface UserService extends UserDetailsService {
     void updateVIPCoin(UserEntity userEntity, int coin);
     UserGradeEntity getVIPType();
     List<UserEntity> getUserGrade(UserGradeEntity userGradeEntity);
+    String getGradeUid(String type);
+    String getGradeType(String uid);
     int updateUserAge(UserDto userDto);
     int updateUserAge(String birth);
     List<UserDetailEntity> getByAll();
@@ -37,6 +39,6 @@ public interface UserService extends UserDetailsService {
     UserDto updateUserGradeVIP(PurchaseDto purchaseDto);
     boolean updateUserSettings(UserDto userDto);
     UserDto getUser(String userUid);
-
     UserDetailEntity getUserDetail(String userUid);
+    boolean checkNickname(UserDto userDto);
 }

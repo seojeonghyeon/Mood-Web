@@ -17,7 +17,8 @@ public class ResponseMatchingUser {
 
     private String birthdate;
 
-    private String location;
+    private String locationENG;
+    private String locationKOR;
 
     private double physicalDistance;
 

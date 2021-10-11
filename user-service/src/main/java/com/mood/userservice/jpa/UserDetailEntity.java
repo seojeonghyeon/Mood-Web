@@ -51,7 +51,10 @@ public class UserDetailEntity {
     private String dating;
 
     @Column(nullable = false)
-    private String location;
+    private String locationENG;
+
+    @Column(nullable = false)
+    private String locationKOR;
 
     @Column(nullable = false)
     private double latitude;
@@ -60,7 +63,10 @@ public class UserDetailEntity {
     private double longitude;
 
     @Column(nullable = true)
-    private String subLocation;
+    private String subLocationENG;
+
+    @Column(nullable = true)
+    private String subLocationKOR;
 
     @Column(nullable = true)
     private double subLatitude;

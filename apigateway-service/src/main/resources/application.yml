@@ -1,7 +1,9 @@
 
 server:
   port: 8000
-
+token:
+  expiration_time: 864000000
+  secret: mood_user_token
 eureka:
   client:
     register-with-eureka: true
@@ -24,6 +26,16 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        #3
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/autologin
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
         #regist
         - id: user-service
           uri: lb://USER-SERVICE
@@ -38,6 +50,15 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/user-service/checkEmail
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        #checkEmail
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/checkNickname
             - Method=POST
           filters:
             - RemoveRequestHeader=Cookie

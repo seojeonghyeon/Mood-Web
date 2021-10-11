@@ -10,4 +10,5 @@ public interface UserGradeService {
     boolean disabledUserGrade(UserGradeDto userGradeDto);
     List<UserGradeEntity> getUserGrade();
     String getUserGrade(String userGradeType);
+    String printUserGrade(String userUid);
 }

@@ -4,8 +4,10 @@ import com.mood.userservice.dto.BlockUserDto;
 import com.mood.userservice.jpa.BlockUserEntity;
 import com.mood.userservice.jpa.BlockUserRepository;
 import com.mood.userservice.jpa.UserEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
+@Slf4j
 public class BlockUserServiceImpl implements BlockUserService{
     BlockUserRepository blockUserRepository;
 
@@ -37,14 +41,9 @@ public class BlockUserServiceImpl implements BlockUserService{
                 blockUserDto.setBlockUid(UUID.randomUUID().toString());
                 for (BlockUserEntity blockUserEntity : list){
                     if(blockUserDto.getPhoneNum().equals(blockUserEntity.getPhoneNum())){
-                        if(blockUserDto.isDisabled()!=blockUserEntity.isDisabled()){
                             updateBlockUser(blockUserDto);
                             check=false;
                             break;
-                        }else{
-                            check=false;
-                            break;
-                        }
                     }
                 }
                 if(check){
@@ -62,17 +61,26 @@ public class BlockUserServiceImpl implements BlockUserService{
         }
         return false;
     }
+
     public void updateBlockUser(BlockUserDto blockUserDto){
         Optional<BlockUserEntity> optional = blockUserRepository.findByUserUidAndPhoneNum(blockUserDto.getUserUid(), blockUserDto.getPhoneNum());
         optional.ifPresent(selectUser->{
             selectUser.setBlockTime(LocalDateTime.now());
-            selectUser.setDisabled(blockUserDto.isDisabled());
+            selectUser.setDisabled(!blockUserDto.isDisabled());
             blockUserRepository.save(selectUser);
         });
     }
 
     @Override
-    public List<BlockUserDto> getBlockUsers(String userUid) {
-        return null;
+    public List<String> getBlockUsers(String userUid) {
+        List<String> list = new ArrayList<>();
+        Optional<Iterable<BlockUserEntity>> optional = blockUserRepository.findByUserUidAndDisabled(userUid, false);
+        if(optional.isPresent()){
+            Iterable<BlockUserEntity> iterable = optional.get();
+            iterable.forEach(v->
+                    list.add(v.getPhoneNum()));
+            return list;
+        }
+        return list;
     }
 }

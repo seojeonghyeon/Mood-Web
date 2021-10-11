@@ -3,16 +3,9 @@ package com.mood.userservice.controller;
 import com.mood.userservice.auth.AuthorizationExtractor;
 import com.mood.userservice.auth.BearerAuthConverser;
 import com.mood.userservice.auth.CreateAuthBearerToken;
-import com.mood.userservice.dto.PurchaseDto;
-import com.mood.userservice.dto.RatePlanDto;
-import com.mood.userservice.dto.UserDto;
-import com.mood.userservice.dto.UserGradeDto;
+import com.mood.userservice.dto.*;
 import com.mood.userservice.jpa.RatePlanEntity;
-import com.mood.userservice.jpa.UserEntity;
-import com.mood.userservice.service.MatchingService;
-import com.mood.userservice.service.RatePlanService;
-import com.mood.userservice.service.UserGradeService;
-import com.mood.userservice.service.UserService;
+import com.mood.userservice.service.*;
 import com.mood.userservice.vo.*;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +20,11 @@ import io.jsonwebtoken.Jwts;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -40,16 +35,18 @@ public class UserController {
     private MatchingService matchingService;
     private UserGradeService userGradeService;
     private RatePlanService ratePlanService;
+    private BlockUserService blockUserService;
 
 
     @Autowired
     public UserController(Environment env, UserService userService, UserGradeService userGradeService, MatchingService matchingService,
-                          RatePlanService ratePlanService){
+                          RatePlanService ratePlanService, BlockUserService blockUserService){
         this.env = env;
         this.userService = userService;
         this.matchingService = matchingService;
         this.userGradeService = userGradeService;
         this.ratePlanService = ratePlanService;
+        this.blockUserService = blockUserService;
     }
 
     //Back-end Server, User Service Health Check
@@ -93,9 +90,13 @@ public class UserController {
         if(!userService.checkRegistCertificationIsTrue(user.getPhoneNum())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         }
+        if(userService.checkUserEmail(user.getEmail()))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(user, UserDto.class);
+        userDto.setLocationKOR(user.getLocationKOR());
+        userDto.setSubLocationKOR(user.getSubLocationKOR());
         userDto = userService.createUser(userDto);
         matchingService.updateMatchingUsers(userDto);
         String token = Jwts.builder()
@@ -116,7 +117,20 @@ public class UserController {
         log.info(userDto.getEmail());
         if(requestUser.getEmail().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
-        if(userService.checkUserEmail(userDto))
+        if(userService.checkUserEmail(userDto.getEmail()))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
+    }
+
+    @PostMapping("/checkNickname")
+    public ResponseEntity<ResponseUser> checkNickname(@RequestBody RequestUser requestUser){
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        UserDto userDto = mapper.map(requestUser, UserDto.class);
+        log.info(userDto.getEmail());
+        if(requestUser.getNickname().isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        if(userService.checkNickname(userDto))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
     }
@@ -207,6 +221,12 @@ public class UserController {
         userDto.setUserUid(userUid);
         userDto = userService.getUserInfo(userUid);
         ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
+
+        if(!userDto.getUserGrade().equals("VIP")){
+            responseUser.setSubLocationKOR("");
+            responseUser.setSubLocationENG("");
+        }
+
         String token = new CreateAuthBearerToken().createToken(env, userUid);
         response.addHeader("userToken", token);
         return ResponseEntity.status(HttpStatus.OK).body(responseUser);
@@ -226,6 +246,10 @@ public class UserController {
                 userDto.setUserUid(requestUser.getUserUid());
                 userDto = userService.getUserInfo(userUid);
                 ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
+                if(!userDto.getUserGrade().equals("VIP")){
+                    responseUser.setSubLocationKOR("");
+                    responseUser.setSubLocationENG("");
+                }
                 return ResponseEntity.status(HttpStatus.OK).body(responseUser);
             }
         }
@@ -246,6 +270,12 @@ public class UserController {
             purchaseDto.setUserUid(userUid);
             UserDto userDto = userService.updateUserGradeVIP(purchaseDto);
             ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
+
+            if(!userDto.getUserGrade().equals("VIP")){
+                responseUser.setSubLocationKOR("");
+                responseUser.setSubLocationENG("");
+            }
+
             return ResponseEntity.status(HttpStatus.OK).body(responseUser);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
@@ -265,10 +295,48 @@ public class UserController {
         if(userService.updateUserSettings(userDto)) {
             userDto = userService.getUser(userDto.getUserUid());
             ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
+            if(!userDto.getUserGrade().equals("VIP")){
+                responseUser.setSubLocationKOR("");
+                responseUser.setSubLocationENG("");
+            }
+
             return ResponseEntity.status(HttpStatus.OK).body(responseUser);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
+
+    @PostMapping("/blockPhoneNums")
+    public ResponseEntity<ResponseUser> blockPhoneNums(HttpServletRequest request, @RequestBody List<String> phoneNumList) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
+        if (userUid.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        List<BlockUserDto> blockUserDtoList = new ArrayList<>();
+        for(String phoneNum : phoneNumList){
+            BlockUserDto blockUserDto = new BlockUserDto();
+            blockUserDto.setUserUid(userUid);
+            blockUserDto.setPhoneNum(phoneNum);
+            blockUserDtoList.add(blockUserDto);
+        }
+        if(blockUserService.updateBlockUsers(userUid, blockUserDtoList))
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+    }
+
+    @PostMapping("/getBlockPhoneNums")
+    public ResponseEntity<List<String>> getBlockPhoneNums(HttpServletRequest request, @RequestBody List<String> phoneNumList) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
+        if (userUid.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+        List<String> list = blockUserService.getBlockUsers(userUid);
+        return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
+
     //##
     @PostMapping("/usergrade/regist")
     public ResponseEntity<ResponseUser> createUserGrade(@RequestBody RequestUserGrade userGrade){

@@ -12,7 +12,8 @@ public class ResponsePost {
     private String profileImageIcon;
     private String postUid;
     private String nickname;
-    private String location;
+    private String locationKOR;
+    private String locationENG;
     private int postLikeCount;
     private int postCommentCount;
     private LocalDateTime postTime;

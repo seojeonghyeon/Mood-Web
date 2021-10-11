@@ -14,7 +14,8 @@ public class RequestMatchingUser {
 
     private String birthdate;
 
-    private String location;
+    private String locationKOR;
+    private String locationENG;
 
     private double physicalDistance;
 

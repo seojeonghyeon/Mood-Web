@@ -8,4 +8,5 @@ public interface BlockUserRepository extends CrudRepository<BlockUserEntity, Lon
     Iterable<BlockUserEntity> findDistinctByUserUidAndDisabled(String UserUid, boolean disabled);
     Optional<Iterable<BlockUserEntity>> findByUserUid(String userUid);
     Optional<BlockUserEntity> findByUserUidAndPhoneNum(String userUid, String phoneNum);
+    Optional<Iterable<BlockUserEntity>> findByUserUidAndDisabled(String userUid, boolean disabled);
 }

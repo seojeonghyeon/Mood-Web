@@ -63,4 +63,12 @@ public class UserGradeServiceImpl implements UserGradeService{
     public String getUserGrade(String userGradeType) {
         return userGradeRepository.findByGradeType(userGradeType).getGradeUid();
     }
+
+    @Override
+    public String printUserGrade(String userUid) {
+        UserGradeEntity userGradeEntity = userGradeRepository.findByGradeUid(userUid);
+        if(userGradeEntity.getGradeType().equals("VIP"))
+            return "VIP";
+        return "basic";
+    }
 }

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class CertificationNumberDto {
+    private String certificationUid;
     private boolean disabled;
     private String phoneNum;
     private int creditNumber;

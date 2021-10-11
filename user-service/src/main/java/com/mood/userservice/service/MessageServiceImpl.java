@@ -30,12 +30,14 @@ public class MessageServiceImpl implements MessageService {
         this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
+    @Override
     public int createRandomNumber(){
         Random random = new Random();
         int number = (random.nextInt(8888)+1111);
         return number;
     }
 
+    @Override
     public void sendMessage(String message, String toNumber){
         log.info("Before send message : "+ LocalDateTime.now()+" = To : "+toNumber+" Message : "+message);
 

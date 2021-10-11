@@ -13,6 +13,9 @@ public class CertificationNumberEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 50, unique = true)
+    private String certificationUid;
+
     @Column(nullable = false)
     private boolean disabled;
 

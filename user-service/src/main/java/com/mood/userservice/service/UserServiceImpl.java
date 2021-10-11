@@ -99,6 +99,10 @@ public class UserServiceImpl implements UserService {
         userEntity.setEncryptedPwd(passwordEncoder.encode(userDto.getPassword()));
         userDetailEntity.setOtherM(userDto.isOtherM());
         userDetailEntity.setOtherW(userDto.isOtherW());
+        userDetailEntity.setLocationKOR(userDto.getLocationKOR());
+        userDetailEntity.setLocationENG(userDto.getLocationENG());
+        userDetailEntity.setSubLocationKOR(userDto.getSubLocationKOR());
+        userDetailEntity.setSubLocationENG(userDto.getSubLocationENG());
         userRepository.save(userEntity);
         userDetailRepository.save(userDetailEntity);
         UserDto returnUserDto = mapper.map(userEntity, UserDto.class);
@@ -134,15 +138,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean checkUserEmail(UserDto userDto) {
-        Optional<UserEntity> optional = userRepository.findByEmail(userDto.getEmail());
+    public boolean checkUserEmail(String email) {
+        Optional<UserEntity> optional = userRepository.findByEmail(email);
         if(optional.isPresent()) return true;
         else return false;
     }
 
     @Override
     public String getEmailByPhoneNum(UserDto userDto) {
-        Optional<UserEntity> optional = userRepository.findByCreditEnabledAndPhoneNum(false, userDto.getPhoneNum());
+        Optional<UserEntity> optional = userRepository.findTop1ByCreditEnabledAndPhoneNumOrderByRecentLoginTime(false, userDto.getPhoneNum());
         if(optional.isPresent()) {
             UserEntity userEntity = optional.get();
             return userEntity.getEmail();
@@ -152,7 +156,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean getCertification(UserDto userDto) {
-        Optional<UserEntity> optional = userRepository.findByPhoneNum(userDto.getPhoneNum());
+        Optional<UserEntity> optional = userRepository.findTop1ByPhoneNumOrderByRecentLoginTime(userDto.getPhoneNum());
         if(optional.isPresent()) {
             UserEntity userEntity = optional.get();
             if(LocalDateTime.now().isBefore(userEntity.getCreditTime().plusMinutes(30))){
@@ -169,12 +173,9 @@ public class UserServiceImpl implements UserService {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         CertificationNumberEntity certificationNumberEntity;
         CertificationNumberDto certificationNumberDto = new CertificationNumberDto();
-
         Optional<CertificationNumberEntity> optional
                 = certificationNumberRepository.findByPhoneNum(phoneNum);
         if(optional.isPresent()) {
-            certificationNumberEntity = optional.get();
-            certificationNumberDto = mapper.map(certificationNumberEntity, CertificationNumberDto.class);
             optional.ifPresent(selectUser->{
                 selectUser.setPhoneNum(phoneNum);
                 selectUser.setDisabled(false);
@@ -183,6 +184,7 @@ public class UserServiceImpl implements UserService {
                 certificationNumberRepository.save(selectUser);
             });
         }else{
+            certificationNumberDto.setCertificationUid(UUID.randomUUID().toString());
             certificationNumberDto.setDisabled(false);
             certificationNumberDto.setCreatedAt(LocalDateTime.now());
             certificationNumberDto.setCreditNumber(number);
@@ -191,7 +193,7 @@ public class UserServiceImpl implements UserService {
                     CertificationNumberEntity.class);
             certificationNumberRepository.save(certificationNumberEntity);
         }
-        String message = " <#> [Mood] 본인인증 번호는 ["+certificationNumberDto.getCreditNumber()+"] 입니다. "+hashkey+"  ";
+        String message = " <#> [Mood] 본인인증 번호는 ["+number+"] 입니다. "+hashkey+"  ";
         messageService.sendMessage(message, phoneNum);
     }
 
@@ -298,6 +300,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String getGradeUid(String type) {
+        UserGradeEntity userGradeEntity = userGradeRepository.findByGradeType(type);
+        return userGradeEntity.getGradeUid();
+    }
+
+    @Override
+    public String getGradeType(String uid) {
+        UserGradeEntity userGradeEntity = userGradeRepository.findByGradeUid(uid);
+        return userGradeEntity.getGradeType();
+    }
+
+    @Override
     public boolean sendCreditNumber(String phoneNum, String hashkey) {
         int randomNumber = messageService.createRandomNumber();
         String message = " <#> [Mood] 본인인증 번호는 ["+randomNumber+"] 입니다. "+hashkey+"  ";
@@ -379,7 +393,7 @@ public class UserServiceImpl implements UserService {
                 selectUser.setGradeStart(userEntity.getGradeStart());
                 selectUser.setGradeEnd(userEntity.getGradeEnd());
                 if(vipDown){
-                    selectUser.setSubLocation(null);
+                    selectUser.setSubLocationKOR("");
                     selectUser.setSubLatitude(0.0);
                     selectUser.setSubLongitude(0.0);
                 }
@@ -450,16 +464,16 @@ public class UserServiceImpl implements UserService {
                     userDto.setMaxDistance(getUserDetailEntity.getMaxDistance());
                 }
             }
-            if(!getUserDetailEntity.getLocation().equals(userDto.getLocation())){
+            if(!getUserDetailEntity.getLocationENG().equals(userDto.getLocationENG())){
                 if(getUserEntity.getCoin() >= 10){
                     getUserEntity.setCoin(getUserEntity.getCoin()-10);
                 }else{
-                    userDto.setLocation(getUserDetailEntity.getLocation());
+                    userDto.setLocationENG(getUserDetailEntity.getLocationENG());
                 }
             }
-            if(!getUserDetailEntity.getSubLocation().equals(userDto.getSubLocation())){
+            if(!getUserDetailEntity.getSubLocationENG().equals(userDto.getSubLocationENG())){
                 if(!getUserEntity.getUserGrade().equals(userGradeService.getUserGrade(VIP))){
-                    userDto.setSubLocation(getUserDetailEntity.getSubLocation());
+                    userDto.setSubLocationENG(getUserDetailEntity.getSubLocationENG());
                     userDto.setSubLatitude(getUserDetailEntity.getSubLatitude());
                     userDto.setSubLongitude(getUserDetailEntity.getSubLongitude());
                 }
@@ -481,11 +495,11 @@ public class UserServiceImpl implements UserService {
                 selectUser.setMinAge(userDto.getMinAge());
                 selectUser.setMaxAge(userDto.getMaxAge());
 
-                selectUser.setLocation(userDto.getLocation());
+                selectUser.setLocationENG(userDto.getLocationENG());
                 selectUser.setLatitude(userDto.getLatitude());
                 selectUser.setLongitude(userDto.getLongitude());
 
-                selectUser.setSubLocation(userDto.getSubLocation());
+                selectUser.setSubLocationENG(userDto.getSubLocationENG());
                 selectUser.setSubLongitude(userDto.getSubLongitude());
                 selectUser.setSubLatitude(userDto.getSubLatitude());
                 userDetailRepository.save(selectUser);
@@ -506,6 +520,7 @@ public class UserServiceImpl implements UserService {
             UserDetailEntity userDetailEntity = optionalUserDetailEntity.get();
             UserDto userDto = modelMapper.map(userDetailEntity, UserDto.class);
             userDto.settingUserDto(userEntity);
+            userDto.setUserGrade(userGradeService.printUserGrade(userDto.getUserGrade()));
             return userDto;
         }
         return null;
@@ -517,6 +532,14 @@ public class UserServiceImpl implements UserService {
         if(optional.isPresent())
             return optional.get();
         return null;
+    }
+
+    @Override
+    public boolean checkNickname(UserDto userDto) {
+        Optional<UserEntity> optional = userRepository.findByNickname(userDto.getNickname());
+        if(optional.isPresent())
+            return true;
+        return false;
     }
 
     @Override
@@ -573,6 +596,7 @@ public class UserServiceImpl implements UserService {
             userDetailRepository.save(userDetailEntity);
             UserDto userDto = modelMapper.map(userDetailEntity, UserDto.class);
             userDto.settingUserDto(getUserEntity);
+            userDto.setUserGrade(userGradeService.printUserGrade(userDto.getUserGrade()));
             return userDto;
         }
         return new UserDto();
@@ -588,6 +612,8 @@ public class UserServiceImpl implements UserService {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Optional<UserEntity> optional = userRepository.findByUserUid(userUid);
+        UserEntity userEntity = optional.get();
+        userEntity.setUserGrade(userGradeService.printUserGrade(userEntity.getUserGrade()));
         if(optional.isPresent()) return modelMapper.map(optional.get(), UserDto.class);
         return null;
     }

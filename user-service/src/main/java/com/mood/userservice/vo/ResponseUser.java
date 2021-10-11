@@ -49,13 +49,17 @@ public class ResponseUser {
 
     private String profileImageIcon;
 
-    private String location;
+    private String locationKOR;
+
+    private String locationENG;
 
     private double latitude;
 
     private double longitude;
 
-    private String subLocation;
+    private String subLocationKOR;
+
+    private String subLocationENG;
 
     private double subLatitude;
 

@@ -50,12 +50,14 @@ public class UserDto {
     private String profileImageIcon;
 
     //Location Name, Eng. Alert a Kor in need.
-    private String location;
+    private String locationENG;
+    private String locationKOR;
     private double latitude;
     private double longitude;
 
     //Sublocation Name, Eng for User's grade on VIP . Alert a Kor in need.
-    private String subLocation;
+    private String subLocationENG;
+    private String subLocationKOR;
     private double subLatitude;
     private double subLongitude;
 

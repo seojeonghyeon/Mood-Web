@@ -79,14 +79,20 @@ public class RequestUser {
     private String profileImageIcon;
 
     @Size(min = 1, message = "Location must be equeal or grater than 1 characters")
-    private String location;
+    private String locationKOR;
+
+    @Size(min = 1, message = "Location must be equeal or grater than 1 characters")
+    private String locationENG;
 
     private double latitude;
 
     private double longitude;
 
     @Size(min = 1, message = "Location must be equeal or grater than 1 characters")
-    private String subLocation;
+    private String subLocationKOR;
+
+    @Size(min = 1, message = "Location must be equeal or grater than 1 characters")
+    private String subLocationENG;
 
     private double subLatitude;
 

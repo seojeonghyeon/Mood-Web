@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface BlockUserService {
     boolean updateBlockUsers(String userUid, List<BlockUserDto> blockUserDtoList);
-    List<BlockUserDto> getBlockUsers(String userUid);
+    List<String> getBlockUsers(String userUid);
 }

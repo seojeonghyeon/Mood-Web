@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -70,7 +68,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .compact();
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        userDetails.setUserGrade(userService.getGradeType(userDetails.getUserGrade()));
         ResponseUser responseUser = mapper.map(userDetails, ResponseUser.class);
+
+        if(!userDetails.getUserGrade().equals("VIP")){
+            responseUser.setSubLocationKOR("");
+            responseUser.setSubLocationENG("");
+        }
 
         response.addHeader("userToken", token);
         response.setContentType("application/json");
