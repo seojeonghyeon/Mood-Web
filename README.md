@@ -3,7 +3,9 @@
   
   
   데이팅 앱(Mood)의 서버(Back-end)관련 개발 진행 중인 소스입니다. 본 코드는 수익과 관련이 있을 수 있으므로 무단 유출과 배포, 사용을 금지합니다.(2021.10.7)
-
+  
+  개인적인 소스 코드에 대한 Notion 확인이 가능합니다.
+  https://seojeonghyeon0630.notion.site/35a8b455c30d4255a5410934f3b3beba?v=e0f72e4a793f40c985120312b8bf854d
 
 * [DOCUMENT](#document)
 * [Server](#server)
