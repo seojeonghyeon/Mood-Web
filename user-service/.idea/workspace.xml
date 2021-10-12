@@ -5,14 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="efc9baa0-36e8-4b6c-a741-42b817a45ce7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/auth/AuthorizationExtractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/auth/BearerAuthConverser.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/auth/CreateAuthBearerToken.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/controller/PostController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/CommentInfoDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/HashtagDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/LikeDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/PostDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/HashtagEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/HashtagRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/PostEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/PostRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/UserDetailEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/UserDetailRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/UserEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/UserGradeEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/UserGradeRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/UserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/RequestHashtag.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/RequestLike.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/RequestPost.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/ResponseCommentInfo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/ResponsePost.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/resources/bootstrap.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).docx" beforeDir="false" afterPath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).docx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../docker-files/kafka-docker" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-files/kafka-docker" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/UserGradeScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/UserGradeScheduler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/VIPScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/VIPScheduler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/BlockUserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/BlockUserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,7 +176,11 @@
       <workItem from="1633752167855" duration="7528000" />
       <workItem from="1633849425597" duration="2826000" />
       <workItem from="1633871246225" duration="1098000" />
-      <workItem from="1633928186719" duration="16755000" />
+      <workItem from="1633928186719" duration="17347000" />
+      <workItem from="1634004729647" duration="2505000" />
+      <workItem from="1634013959767" duration="696000" />
+      <workItem from="1634028759066" duration="70000" />
+      <workItem from="1634028957052" duration="1941000" />
     </task>
     <servers />
   </component>

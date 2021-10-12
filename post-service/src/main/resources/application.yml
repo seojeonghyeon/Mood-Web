@@ -1,0 +1,39 @@
+server:
+  port: 0
+token:
+  expiration_time: 864000000
+  secret: mood_user_token
+spring:
+  application:
+    name: post-service
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /h2
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/mooddb
+    username: root
+    password: '00000000'
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+    instance:
+      instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
+
+logging:
+  level:
+    com.mood.lockservice.client: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, refresh, health, metrics
