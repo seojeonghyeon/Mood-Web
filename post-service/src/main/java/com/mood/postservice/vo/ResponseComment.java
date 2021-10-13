@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseCommentInfo {
+public class ResponseComment {
     private String commentId;
     private String commentUid;
     private String nickname;

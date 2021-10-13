@@ -2,13 +2,12 @@ package com.mood.postservice.controller;
 
 import com.mood.postservice.auth.AuthorizationExtractor;
 import com.mood.postservice.auth.BearerAuthConverser;
+import com.mood.postservice.dto.CommentDto;
 import com.mood.postservice.dto.HashtagDto;
 import com.mood.postservice.dto.PostDto;
+import com.mood.postservice.service.CommentService;
 import com.mood.postservice.service.PostService;
-import com.mood.postservice.vo.RequestHashtag;
-import com.mood.postservice.vo.RequestPost;
-import com.mood.postservice.vo.ResponseCommentInfo;
-import com.mood.postservice.vo.ResponsePost;
+import com.mood.postservice.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -29,11 +28,13 @@ import java.util.List;
 public class PostController {
     private Environment env;
     private PostService postService;
+    private CommentService commentService;
 
     @Autowired
-    public PostController(Environment env, PostService postService){
+    public PostController(Environment env, PostService postService, CommentService commentService){
         this.env=env;
         this.postService=postService;
+        this.commentService=commentService;
     }
 
     //Back-end Server, User Service Health Check
@@ -46,6 +47,7 @@ public class PostController {
                 +", token expiration time=" + env.getProperty("token.expiration_time"));
     }
 
+    //##
     @PostMapping("/registPost")
     public ResponseEntity<ResponsePost> registPost(HttpServletRequest request, @RequestBody RequestPost requestPost){
         ModelMapper mapper = new ModelMapper();
@@ -54,26 +56,68 @@ public class PostController {
         String postUid = bearerAuthConverser.handle(request, env);
         if(postUid.equals(null))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponsePost());
-        log.info("Request Post : " + requestPost);
         PostDto postDto = mapper.map(requestPost, PostDto.class);
         List<RequestHashtag> requestHashtagList;
         int HOCK = 0;
-        if(!requestPost.getRequestHashtags().get(0).getHashtagName().isBlank())
+        if(!requestPost.getRequestHashtags().equals(null))
             HOCK=1;
 
         List<HashtagDto> hashtagDtos = new ArrayList<>();
         postDto.setPostUid(postUid);
-        postDto.setHashtagDtos(hashtagDtos);
         if(HOCK==1) {
             requestHashtagList = requestPost.getRequestHashtags();
             for (RequestHashtag requestHashtag : requestHashtagList)
                 hashtagDtos.add(mapper.map(requestHashtag, HashtagDto.class));
         }
+        postDto.setHashtagDtos(hashtagDtos);
+
         if(postService.registPost(postDto, HOCK))
             return ResponseEntity.status(HttpStatus.OK).body(new ResponsePost());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponsePost());
     }
 
+    @PostMapping("/updatePost")
+    public ResponseEntity<ResponsePost> updatePost(HttpServletRequest request, @RequestBody RequestPost requestPost){
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String postUid = bearerAuthConverser.handle(request, env);
+        if(postUid.equals(null))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponsePost());
+        PostDto postDto = mapper.map(requestPost, PostDto.class);
+        List<RequestHashtag> requestHashtagList;
+        int HOCK = 0;
+        if(!requestPost.getRequestHashtags().equals(null))
+            HOCK=1;
+
+        List<HashtagDto> hashtagDtos = new ArrayList<>();
+        postDto.setPostUid(postUid);
+        if(HOCK==1) {
+            requestHashtagList = requestPost.getRequestHashtags();
+            for (RequestHashtag requestHashtag : requestHashtagList)
+                hashtagDtos.add(mapper.map(requestHashtag, HashtagDto.class));
+        }
+        postDto.setHashtagDtos(hashtagDtos);
+
+        if(postService.updatePost(postDto, HOCK))
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponsePost());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponsePost());
+    }
+
+    @PostMapping("/deletePost")
+    public ResponseEntity<ResponsePost> deletePost(HttpServletRequest request, @RequestBody RequestPost requestPost){
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String postUid = bearerAuthConverser.handle(request, env);
+        if(postUid.equals(null) && requestPost.getPostId().equals(null))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponsePost());
+        if(postService.deletePost(postUid, requestPost.getPostId()))
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponsePost());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponsePost());
+    }
+
+    //##
     @PostMapping("/getPosts/{page}/{postType}")
     public ResponseEntity<List<ResponsePost>> getPostByType(HttpServletRequest request, @PathVariable int page, @PathVariable String postType) {
         ModelMapper mapper = new ModelMapper();
@@ -92,6 +136,24 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responsePostList);
     }
 
+    @PostMapping("/registComment")
+    public ResponseEntity<ResponseComment> registComment(HttpServletRequest request, @RequestBody RequestComment requestComment) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String commentUid = bearerAuthConverser.handle(request, env);
+        if (commentUid.equals(null))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseComment());
+        CommentDto commentDto = mapper.map(requestComment, CommentDto.class);
+        commentDto.setCommentUid(commentUid);
+        if(commentService.registComment(commentDto)) {
+            postService.updateCommentCount(commentDto.getPostId());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseComment());
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseComment());
+    }
+
+
     @PostMapping("/clickLike/{postId}/{commentId}")
     public ResponseEntity<ResponsePost> clickLike(HttpServletRequest request, @PathVariable String postId, @RequestBody String commentId) {
         ModelMapper mapper = new ModelMapper();
@@ -108,13 +170,13 @@ public class PostController {
     @PostMapping("/getList")
     public ResponseEntity<ResponsePost> clickLike(HttpServletRequest request) {
         ResponsePost responsePost = new ResponsePost();
-        List<ResponseCommentInfo> responseCommentInfoList = new ArrayList<>();
+        List<ResponseComment> responseCommentInfoList = new ArrayList<>();
         responsePost.setPostId("abc");
         responsePost.setPostUid("34ad0255-33af-4685-b920-a7112540d505");
         responsePost.setPostImage("https://firebasestorage.googleapis.com/v0/b/mood-d39e8.appspot.com/o/profileImg%2FJPEG__20211010_152520_.png?alt=media&token=b30ff108-46bb-4f83-bc8c-2203df77505c");
         responsePost.setPostContents("인생의 품었기 얼마나 위하여 대고, 가는 끓는 예수는 끓는다. 가장 청춘 끓는 같으며, 사라지지 천고에 가슴이 쓸쓸하랴? 청춘 인류의 가지에 장식하는 뜨고, 피에 능히 품으며, 그리하였는가? #hi #hello #안녕 #서울");
         for(int i=0; i < 4; i++){
-            ResponseCommentInfo responseCommentInfo = new ResponseCommentInfo();
+            ResponseComment responseCommentInfo = new ResponseComment();
             responseCommentInfo.setCommentId("bcd : "+i);
             responseCommentInfo.setCommentContents("hello!");
             responseCommentInfo.setCommentGroup(1);

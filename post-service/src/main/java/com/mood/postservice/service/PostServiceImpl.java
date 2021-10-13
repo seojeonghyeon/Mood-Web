@@ -76,6 +76,80 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
+    public boolean updatePost(PostDto postDto, int HOCK) {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Optional<PostEntity> optionalPostEntity = postRepository.findByPostIdAndPostUidAndDisabled(postDto.getPostId(), postDto.getPostUid(), false);
+        optionalPostEntity.ifPresent(selectUser->{
+            selectUser.setPostTime(LocalDateTime.now());
+            selectUser.setLocationENG(postDto.getLocationENG());
+            selectUser.setLocationKOR(postDto.getLocationKOR());
+            selectUser.setPostContents(postDto.getPostContents());
+            selectUser.setPostImage(postDto.getPostImage());
+            postRepository.save(selectUser);
+        });
+
+        List<HashtagEntity> hashtagEntityList = new ArrayList<>();
+        if(HOCK==1) {
+            for (HashtagDto hashtagDto : postDto.getHashtagDtos()) {
+                hashtagDto.setHashtagId(UUID.randomUUID().toString());
+                hashtagDto.setPostId(postDto.getPostId());
+                hashtagDto.setPostUid(postDto.getPostUid());
+                hashtagDto.setHashingTime(LocalDateTime.now());
+
+                hashtagEntityList.add(modelMapper.map(hashtagDto, HashtagEntity.class));
+            }
+        }
+
+        Optional<Iterable<HashtagEntity>> optionalHashtagEntities = hashtagRepository.findByPostIdAndPostUid(postDto.getPostId(), postDto.getPostUid());
+        if((HOCK==0) && (optionalHashtagEntities.isPresent())){
+            for(HashtagEntity hashtagEntity : optionalHashtagEntities.get())
+                switchingHashtag(hashtagEntity, true);
+        }else if((HOCK==1) && (!optionalHashtagEntities.isPresent())){
+            for (HashtagEntity hashtagEntity : hashtagEntityList) {
+                hashtagEntity.setDisabled(false);
+                hashtagRepository.save(hashtagEntity);
+            }
+        }else if((HOCK==1) && (optionalHashtagEntities.isPresent())){
+            for(HashtagEntity hashtagEntity : hashtagEntityList){
+                boolean check = true;
+                for(HashtagEntity getHashtagEntity : optionalHashtagEntities.get()){
+                    if(hashtagEntity.getHashtagName().equals(getHashtagEntity.getHashtagName())){
+                        check = false;
+                    }
+                }
+                if(check){
+                    hashtagEntity.setDisabled(false);
+                    hashtagRepository.save(hashtagEntity);
+                }
+            }
+
+            for(HashtagEntity getHashtagEntity : optionalHashtagEntities.get()){
+                boolean check = true;
+                for(HashtagEntity hashtagEntity : hashtagEntityList){
+                    if(hashtagEntity.getHashtagName().equals(getHashtagEntity.getHashtagName())){
+                        check = false;
+                    }
+                }
+                if(check){
+                    switchingHashtag(getHashtagEntity, true);
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean deletePost(String postUid, String postId) {
+        Optional<PostEntity> optional = postRepository.findByPostIdAndPostUidAndDisabled(postId, postUid, false);
+        optional.ifPresent(selectUser->{
+            selectUser.setDisabled(true);
+            postRepository.save(selectUser);
+        });
+        return true;
+    }
+
+    @Override
     public boolean checkUserUid(String postUid) {
         Optional<UserEntity> optional = userRepository.findByUserUid(postUid);
         if(optional.isPresent())
@@ -131,6 +205,18 @@ public class PostServiceImpl implements PostService{
         }
         return postDtoList;
     }
+
+    @Override
+    public void updateCommentCount(String postId) {
+        Optional<PostEntity> optional = postRepository.findByPostIdAndDisabled(postId, false);
+        optional.ifPresent(selectUser->{
+            selectUser.setPostCommentCount(selectUser.getPostLikeCount()+1);
+            postRepository.save(selectUser);
+        });
+    }
+
+
+
     public UserEntity getUserEntityByPostDto(String postUid){
         Optional<UserEntity> optional = userRepository.findByUserUid(postUid);
         if(optional.isPresent()){
@@ -154,5 +240,12 @@ public class PostServiceImpl implements PostService{
             return userGradeEntity;
         }
         return null;
+    }
+    public void switchingHashtag(HashtagEntity hashtagEntity, boolean disabled){
+        Optional<HashtagEntity> optional = hashtagRepository.findByPostUidAndDisabledAndHashtagName(hashtagEntity.getPostUid(), !disabled, hashtagEntity.getHashtagName());
+        optional.ifPresent(selectUser->{
+            selectUser.setDisabled(disabled);
+            hashtagRepository.save(selectUser);
+        });
     }
 }

@@ -19,4 +19,5 @@ public class RequestPost {
 
     private List<RequestHashtag> requestHashtags;
     private List<RequestLike> requestLikes;
+    private List<RequestComment> requestComments;
 }

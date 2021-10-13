@@ -20,5 +20,5 @@ public class ResponsePost {
     private LocalDateTime postTime;
     private String postImage;
     private String postContents;
-    private List<ResponseCommentInfo> responseCommentInfoList;
+    private List<ResponseComment> responseCommentInfoList;
 }

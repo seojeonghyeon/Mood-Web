@@ -14,4 +14,6 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
     List<PostEntity> findByDisabledOrderByPostTimeDesc(boolean disabled, Pageable pageable);
     List<PostEntity> findByDisabledOrderByPostLikeCountDesc(boolean disabled, Pageable pageable);
     List<PostEntity> findByDisabledAndLocationENGOrderByPostTimeDesc(boolean disabled, String locationENG, Pageable pageable);
+    Optional<PostEntity> findByPostIdAndPostUidAndDisabled(String postId, String postUid, boolean disabled);
+    Optional<PostEntity> findByPostIdAndDisabled(String postId, boolean disabled);
 }

@@ -5,21 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="efc9baa0-36e8-4b6c-a741-42b817a45ce7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../post-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/CommentEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/CommentRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/CommentService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/CommentServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/RequestComment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).docx" beforeDir="false" afterPath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).pdf" beforeDir="false" afterPath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SQL/CREATETABLE.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../SQL/CREATETABLE.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apigateway-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../apigateway-service/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../docker-files/kafka-docker" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-files/kafka-docker" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/controller/PostController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/HashtagDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/HashtagDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/HashtagEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/HashtagEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/CommentInfoDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/CommentDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/PostDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/PostDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/HashtagRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/HashtagRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/PostRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/PostRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/ResponseCommentInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/ResponseCommentInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/RequestPost.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/RequestPost.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/ResponseCommentInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/ResponseComment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/ResponsePost.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/ResponsePost.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,6 +170,7 @@
       <workItem from="1634013959767" duration="696000" />
       <workItem from="1634028759066" duration="70000" />
       <workItem from="1634028957052" duration="3739000" />
+      <workItem from="1634140000101" duration="1375000" />
     </task>
     <servers />
   </component>

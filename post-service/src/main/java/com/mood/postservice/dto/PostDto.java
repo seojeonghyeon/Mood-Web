@@ -1,6 +1,5 @@
 package com.mood.postservice.dto;
 
-import com.mood.postservice.vo.ResponseCommentInfo;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -24,7 +23,7 @@ public class PostDto {
     private int postLikeCount;
     private int postCommentCount;
     private LocalDateTime postTime;
-    private List<CommentInfoDto> responseCommentInfoList;
+    private List<CommentDto> responseCommentInfoList;
     private List<HashtagDto> hashtagDtos;
     private List<LikeDto> likeDtos;
 
