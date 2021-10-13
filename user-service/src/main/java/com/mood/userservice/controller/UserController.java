@@ -425,7 +425,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(responseRatePlan);
     }
 
-    @PostMapping("/rateplans/addRatePlans")
+    @PostMapping("/rateplans/getRatePlans")
     public ResponseEntity<List<ResponseRatePlan>> getRatePlans(){
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);

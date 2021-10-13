@@ -173,7 +173,25 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/lock-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
-
+        #POST SERVICE - GET
+        - id: post-service
+          uri: lb://POST-SERVICE
+          predicates:
+            - Path=/post-service/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/post-service/(?<segment>.*), /$\{segment}
+        #POSTSERVICE -POST
+        - id: post-service
+          uri: lb://POST-SERVICE
+          predicates:
+            - Path=/post-service/**
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/post-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
 management:
   endpoints:
     web:

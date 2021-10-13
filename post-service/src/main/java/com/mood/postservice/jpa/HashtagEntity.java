@@ -16,7 +16,7 @@ public class HashtagEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String hashTagId;
+    private String hashtagId;
 
     @Column(nullable = false)
     private String postId;

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class HashtagDto {
-    private String hashTagId;
+    private String hashtagId;
     private String postId;
     private String postUid;
     private String hashtagName;

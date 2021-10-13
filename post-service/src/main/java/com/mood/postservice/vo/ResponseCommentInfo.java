@@ -14,8 +14,8 @@ public class ResponseCommentInfo {
     private String nickname;
     private String profileImageIcon;
     private String commentContents;
-    private String commentClass;
-    private String commentGroup;
+    private int commentClass;
+    private int commentGroup;
     private LocalDateTime commentTime;
     private int commentLikeCount;
 }

@@ -8,10 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -46,7 +43,7 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public boolean registPost(PostDto postDto) {
+    public boolean registPost(PostDto postDto, int HOCK) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         List<HashtagEntity> hashtagEntityList = new ArrayList<>();
@@ -55,22 +52,26 @@ public class PostServiceImpl implements PostService{
         postDto.setPostTime(LocalDateTime.now());
         postDto.setPostCommentCount(0);
         postDto.setPostLikeCount(0);
-        postDto.setDisabled(false);
-        for(HashtagDto hashtagDto : postDto.getHashtagDtos()){
-            hashtagDto.setHashTagId(UUID.randomUUID().toString());
-            hashtagDto.setPostId(postDto.getPostId());
-            hashtagDto.setPostUid(postDto.getPostUid());
-            hashtagDto.setHashingTime(LocalDateTime.now());
-            hashtagDto.setDisabled(false);
+        if(HOCK==1) {
+            for (HashtagDto hashtagDto : postDto.getHashtagDtos()) {
+                hashtagDto.setHashtagId(UUID.randomUUID().toString());
+                hashtagDto.setPostId(postDto.getPostId());
+                hashtagDto.setPostUid(postDto.getPostUid());
+                hashtagDto.setHashingTime(LocalDateTime.now());
 
-            hashtagEntityList.add(modelMapper.map(hashtagDto, HashtagEntity.class));
+                hashtagEntityList.add(modelMapper.map(hashtagDto, HashtagEntity.class));
+            }
         }
 
         PostEntity postEntity = modelMapper.map(postDto, PostEntity.class);
+        postEntity.setDisabled(false);
         postRepository.save(postEntity);
-        for (HashtagEntity hashtagEntity : hashtagEntityList)
-            hashtagRepository.save(hashtagEntity);
-
+        if(HOCK==1) {
+            for (HashtagEntity hashtagEntity : hashtagEntityList) {
+                hashtagEntity.setDisabled(false);
+                hashtagRepository.save(hashtagEntity);
+            }
+        }
         return true;
     }
 
@@ -92,18 +93,19 @@ public class PostServiceImpl implements PostService{
         UserEntity userEntity = getUserEntityByPostDto(postUid);
         UserGradeEntity userGradeEntity = getUserGradeEntityByGradeUid(userEntity.getUserGrade());
         log.info("Post Type : " + postType+" page : "+page);
-        int number = switch(postType){
-            case "total" -> 1;
+        int number = switch (postType) {
+            case "total"   -> 1;
             case "popular" -> 2;
-            case "areaA" -> 3;
-            case "areaB" -> 4;
+            case "areaA"   -> 3;
+            case "areaB"   -> 4;
+            default -> 1;
         };
         if((!userGradeEntity.getGradeType().equals(VIP)) && (number==4))
             number = 3;
 
 
         if(number == 1){
-            Iterable<PostEntity> postEntities = postRepository.findByDisabledOrderByPostTimeDesc(false, pageRequest);
+            List<PostEntity> postEntities = postRepository.findByDisabledOrderByPostTimeDesc(false, pageRequest);
             for(PostEntity postEntity : postEntities)
                 postDtoList.add(modelMapper.map(postEntity, PostDto.class));
         }else if(number == 2){
@@ -112,12 +114,12 @@ public class PostServiceImpl implements PostService{
                 postDtoList.add(modelMapper.map(postEntity, PostDto.class));
         }else if(number == 3){
             UserDetailEntity userDetailEntity = getUserDetailEntityByPostDto(postUid);
-            Iterable<PostEntity> postEntities = postRepository.findByDisabledAndLocationENGOrderByPostTimeDesc(false, userDetailEntity.getLocationENG(), pageRequest);
+            List<PostEntity> postEntities = postRepository.findByDisabledAndLocationENGOrderByPostTimeDesc(false, userDetailEntity.getLocationENG(), pageRequest);
             for(PostEntity postEntity : postEntities)
                 postDtoList.add(modelMapper.map(postEntity, PostDto.class));
         }else if(number == 4){
             UserDetailEntity userDetailEntity = getUserDetailEntityByPostDto(postUid);
-            Iterable<PostEntity> postEntities = postRepository.findByDisabledAndLocationENGOrderByPostTimeDesc(false, userDetailEntity.getSubLocationENG(), pageRequest);
+            List<PostEntity> postEntities = postRepository.findByDisabledAndLocationENGOrderByPostTimeDesc(false, userDetailEntity.getSubLocationENG(), pageRequest);
             for(PostEntity postEntity : postEntities)
                 postDtoList.add(modelMapper.map(postEntity, PostDto.class));
         }

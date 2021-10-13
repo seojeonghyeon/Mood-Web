@@ -129,3 +129,27 @@ phone_num varchar(255) not null,
 block_time timestamp not null, 
 disabled boolean not null
 );
+
+create table posts(
+id int auto_increment primary key,
+post_id varchar(255) not null, 
+post_uid varchar(255) not null, 
+post_image varchar(255) null, 
+locationeng varchar(255) null, 
+locationkor varchar(255) null, 
+post_contents varchar(255) null,
+post_like_count int not null,
+post_comment_count int not null,
+post_time timestamp not null, 
+disabled boolean not null
+);
+
+create table hashtags(
+id int auto_increment primary key,
+hashtag_id varchar(255) not null, 
+post_id varchar(255) not null, 
+post_uid varchar(255) null, 
+hashtag_name varchar(255) null, 
+hashtag_time timestamp not null, 
+disabled boolean not null
+);
