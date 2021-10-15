@@ -11,5 +11,9 @@ public interface PostService {
     boolean deletePost(String postUid, String postId);
     boolean checkUserUid(String postUid);
     List<PostDto> getPostByType(String postUid, String postType, int page);
-    void updateCommentCount(String postId);
+    List<PostDto> getPostsByPostUid(String postUid, int page);
+    void updateCommentCount(String postId, int number);
+    void updateLikeCount(String postId, int number);
+    List<PostDto> getPostByHashtag(String hashtagName, int page);
+    PostDto getPostByPostId(String postId);
 }

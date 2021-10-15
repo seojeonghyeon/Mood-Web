@@ -207,14 +207,79 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public void updateCommentCount(String postId) {
-        Optional<PostEntity> optional = postRepository.findByPostIdAndDisabled(postId, false);
-        optional.ifPresent(selectUser->{
-            selectUser.setPostCommentCount(selectUser.getPostLikeCount()+1);
-            postRepository.save(selectUser);
-        });
+    public List<PostDto> getPostsByPostUid(String postUid, int page) {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        List<PostDto> postDtoList = new ArrayList<>();
+        PageRequest pageRequest = PageRequest.of(page, DEFAULT_PAGE_SIZE);
+
+        List<PostEntity> postEntities = postRepository.findByPostUidAndDisabledOrderByPostTimeDesc(postUid, false, pageRequest);
+        for(PostEntity postEntity : postEntities)
+            postDtoList.add(modelMapper.map(postEntity, PostDto.class));
+
+        for(PostDto postDto : postDtoList){
+            UserEntity postUserEntity = getUserEntityByPostDto(postDto.getPostUid());
+            postDto.setNickname(postUserEntity.getNickname());
+            postDto.setProfileImageIcon(postUserEntity.getProfileImageIcon());
+        }
+        return postDtoList;
     }
 
+    @Override
+    public void updateCommentCount(String postId, int number) {
+        log.info("Before Update Comment Count : "+ postId +" "+" number "+ number);
+        Optional<PostEntity> optional = postRepository.findByPostIdAndDisabled(postId, false);
+        if(optional.isPresent()) {
+            log.info("updating data : " + optional.get().getPostCommentCount());
+            optional.ifPresent(selectUser->{
+                selectUser.setPostCommentCount(((number)+(optional.get().getPostCommentCount())));
+                postRepository.save(selectUser);
+            });
+        }
+        log.info("After update");
+    }
+
+    @Override
+    public void updateLikeCount(String postId, int number) {
+        Optional<PostEntity> optional = postRepository.findByPostIdAndDisabled(postId, false);
+        if(optional.isPresent()) {
+            optional.ifPresent(selectUser -> {
+                selectUser.setPostLikeCount(((number)+(optional.get().getPostLikeCount())));
+                postRepository.save(selectUser);
+            });
+        }
+    }
+
+    @Override
+    public List<PostDto> getPostByHashtag(String hashtagName, int page) {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        List<PostDto> postDtoList = new ArrayList<>();
+        PageRequest pageRequest = PageRequest.of(page, DEFAULT_PAGE_SIZE);
+        List<HashtagEntity> hashtagEntityList = hashtagRepository.findByHashtagNameAndDisabledOrderByHashingTimeDesc(hashtagName, false, pageRequest);
+        for(HashtagEntity hashtagEntity : hashtagEntityList){
+            Optional<PostEntity> optionalPostEntity = postRepository.findByPostIdAndDisabled(hashtagEntity.getPostId(), false);
+            if(optionalPostEntity.isPresent())
+                postDtoList.add(modelMapper.map(optionalPostEntity.get(), PostDto.class));
+        }
+
+        return postDtoList;
+    }
+
+    @Override
+    public PostDto getPostByPostId(String postId) {
+        PostDto postDto = null;
+        Optional<PostEntity> optionalPostEntity = postRepository.findByPostIdAndDisabled(postId, false);
+        if(optionalPostEntity.isPresent()){
+            ModelMapper modelMapper = new ModelMapper();
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+            postDto = modelMapper.map(optionalPostEntity.get(), PostDto.class);
+            UserEntity postUserEntity = getUserEntityByPostDto(postDto.getPostUid());
+            postDto.setNickname(postUserEntity.getNickname());
+            postDto.setProfileImageIcon(postUserEntity.getProfileImageIcon());
+        }
+        return postDto;
+    }
 
 
     public UserEntity getUserEntityByPostDto(String postUid){

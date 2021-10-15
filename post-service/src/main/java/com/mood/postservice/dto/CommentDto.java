@@ -11,6 +11,8 @@ public class CommentDto {
 
     //작성자
     private String commentUid;
+    private String nickname;
+    private String profileImageIcon;
 
     //내용
     private String commentContents;
