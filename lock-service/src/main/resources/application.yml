@@ -1,6 +1,8 @@
 server:
   port: 0
-
+token:
+  expiration_time: 864000000
+  secret: mood_user_token
 spring:
   application:
     name: lock-service
@@ -14,8 +16,7 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://localhost:3306/mooddb
     username: root
-    password: 00000000
-#    url: jdbc:mariadb://172.18.0.5:3306/mooddb
+    password: '00000000'
 eureka:
   client:
     service-url:

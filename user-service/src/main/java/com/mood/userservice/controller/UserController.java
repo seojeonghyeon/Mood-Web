@@ -35,16 +35,18 @@ public class UserController {
     private UserGradeService userGradeService;
     private RatePlanService ratePlanService;
     private BlockUserService blockUserService;
+    private CheatingService cheatingService;
 
 
     @Autowired
     public UserController(Environment env, UserService userService, UserGradeService userGradeService,
-                          RatePlanService ratePlanService, BlockUserService blockUserService){
+                          RatePlanService ratePlanService, BlockUserService blockUserService, CheatingService cheatingService){
         this.env = env;
         this.userService = userService;
         this.userGradeService = userGradeService;
         this.ratePlanService = ratePlanService;
         this.blockUserService = blockUserService;
+        this.cheatingService = cheatingService;
     }
 
     //Back-end Server, User Service Health Check
@@ -434,12 +436,15 @@ public class UserController {
     }
 
     @PostMapping("/openCheating")
-    public ResponseEntity<ResponseUser> blockPhoneNums(HttpServletRequest request, @RequestBody List<String> phoneNumList) {
+    public ResponseEntity<ResponseUser> openCheating(HttpServletRequest request) {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
         String userUid = bearerAuthConverser.handle(request, env);
         if (userUid.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
+        if(cheatingService.openCheating(userUid))
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseUser());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 }
