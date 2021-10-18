@@ -73,17 +73,18 @@ public class UserServiceImpl implements UserService {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
+        LocalDateTime localDateTime = LocalDateTime.now();
         userDto.setUserUid(UUID.randomUUID().toString());
-        userDto.setCreateTimeAt(LocalDateTime.now());
-        userDto.setRecentLoginTime(LocalDateTime.now());
-        userDto.setGradeStart(LocalDateTime.now());
-        userDto.setGradeEnd(LocalDateTime.now().plusDays(14));
+        userDto.setCreateTimeAt(localDateTime);
+        userDto.setRecentLoginTime(localDateTime);
+        userDto.setMatchingTime(localDateTime);
+        userDto.setNextMatchingTime(localDateTime);
         userDto.setUserAge(updateUserAge(userDto));
 
         //check circle grade
         userDto.setUserGrade(userGradeRepository.findByGradeType("newbie").getGradeUid());
-        userDto.setGradeStart(LocalDateTime.now());
-        userDto.setGradeEnd(LocalDateTime.now().plusDays(14));
+        userDto.setGradeStart(localDateTime);
+        userDto.setGradeEnd(localDateTime.plusDays(14));
 
         userDto.setCoin(0);
         userDto.setTicket(0);
@@ -92,6 +93,7 @@ public class UserServiceImpl implements UserService {
         userDto.setCreditEnabled(false);
         userDto.setResetMatching(true);
         userDto.setCreditPwd("no pass");
+        userDto.setMatchingTime(LocalDateTime.now());
         //set UserGroup
         UserGroup userGroup = new UserGroup(userDetailRepository, totalUserRepository);
         userDto.setUserGroup(userGroup.selectDecisionTree(userDto));
@@ -581,6 +583,32 @@ public class UserServiceImpl implements UserService {
             }
         }
         return false;
+    }
+
+    @Override
+    public List<UserDto> getUsers() {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Iterable<UserEntity> userEntities = userRepository.findByDisabled(false);
+        List<UserDto> userDtoList = new ArrayList<>();
+        for(UserEntity userEntity : userEntities){
+            Optional<UserDetailEntity> optionalUserDetailEntity = userDetailRepository.findByUserUid(userEntity.getUserUid());
+            UserDto userDto = modelMapper.map(optionalUserDetailEntity.get(), UserDto.class);
+            userDto.settingUserDto(userEntity);
+            userDtoList.add(userDto);
+        }
+        return userDtoList;
+    }
+
+    @Override
+    public void updateUserGroup(UserDto userDto) {
+        UserGroup userGroup = new UserGroup(userDetailRepository, totalUserRepository);
+        userDto.setUserGroup(userGroup.selectDecisionTree(userDto));
+        Optional<UserDetailEntity> optional = userDetailRepository.findByUserUid(userDto.getUserUid());
+        optional.ifPresent(selectUser->{
+            selectUser.setUserGroup(userDto.getUserGroup());
+            userDetailRepository.save(selectUser);
+        });
     }
 
     @Override

@@ -29,5 +29,4 @@ public class RequestMatchingUser {
 
     private int sex;
 
-    MatchingData matchingData;
 }

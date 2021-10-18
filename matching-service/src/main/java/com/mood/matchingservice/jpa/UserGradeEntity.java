@@ -1,4 +1,4 @@
-package com.mood.userservice.jpa;
+package com.mood.matchingservice.jpa;
 
 import lombok.Data;
 

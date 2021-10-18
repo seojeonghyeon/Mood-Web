@@ -32,18 +32,16 @@ import java.util.UUID;
 public class UserController {
     private Environment env;
     private UserService userService;
-    private MatchingService matchingService;
     private UserGradeService userGradeService;
     private RatePlanService ratePlanService;
     private BlockUserService blockUserService;
 
 
     @Autowired
-    public UserController(Environment env, UserService userService, UserGradeService userGradeService, MatchingService matchingService,
+    public UserController(Environment env, UserService userService, UserGradeService userGradeService,
                           RatePlanService ratePlanService, BlockUserService blockUserService){
         this.env = env;
         this.userService = userService;
-        this.matchingService = matchingService;
         this.userGradeService = userGradeService;
         this.ratePlanService = ratePlanService;
         this.blockUserService = blockUserService;
@@ -98,7 +96,6 @@ public class UserController {
         userDto.setLocationKOR(user.getLocationKOR());
         userDto.setSubLocationKOR(user.getSubLocationKOR());
         userDto = userService.createUser(userDto);
-        matchingService.updateMatchingUsers(userDto);
         String token = Jwts.builder()
                 .setSubject(userDto.getUserUid())
                 .setExpiration(new Date(System.currentTimeMillis()+Long.parseLong(env.getProperty("token.expiration_time"))))
@@ -434,5 +431,15 @@ public class UserController {
         ratePlanEntities.forEach(v->
                 list.add(new ModelMapper().map(v, ResponseRatePlan.class)));
         return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
+
+    @PostMapping("/openCheating")
+    public ResponseEntity<ResponseUser> blockPhoneNums(HttpServletRequest request, @RequestBody List<String> phoneNumList) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
+        if (userUid.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseUser());
     }
 }

@@ -1,11 +1,9 @@
-package com.mood.userservice.dto;
+package com.mood.matchingservice.dto;
 
-import com.mood.userservice.jpa.UserEntity;
-import com.mood.userservice.vo.ResponsePost;
+import com.mood.matchingservice.jpa.UserEntity;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 public class UserDto {
@@ -108,8 +106,6 @@ public class UserDto {
     //User's account is disabled. default is false.
     private boolean disabled;
 
-    //User's Posts
-    private List<ResponsePost> PostArticles;
 
     public void settingUserDto(UserEntity userEntity){
         this.email=userEntity.getEmail();

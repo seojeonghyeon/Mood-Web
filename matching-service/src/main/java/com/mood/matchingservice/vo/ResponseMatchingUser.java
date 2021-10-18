@@ -10,15 +10,17 @@ public class ResponseMatchingUser {
 
     private String profileImage;
 
-    private String profileIcon;
+    private String profileImageIcon;
 
     private String nickname;
 
     private String birthdate;
 
-    private String location;
+    private String locationENG;
 
-    private String physicalDistance;
+    private String locationKOR;
+
+    private double physicalDistance;
 
     private int respect;
 
@@ -30,5 +32,5 @@ public class ResponseMatchingUser {
 
     private int sex;
 
-    MatchingData matchingData;
+    private MatchingData matchingData;
 }

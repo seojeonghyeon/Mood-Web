@@ -5,25 +5,52 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="efc9baa0-36e8-4b6c-a741-42b817a45ce7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/LikeEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/LikeRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/LikeService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/LikeServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).docx" beforeDir="false" afterPath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).pdf" beforeDir="false" afterPath="$PROJECT_DIR$/../Communication Protocol/Communication Protocol(Mood).pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Communication Protocol/~$mmunication Protocol(Mood).docx" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/auth/CreateAuthBearerToken.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/dto/UserDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/TotalUserEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/TotalUserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/UserDetailEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/UserDetailRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/UserEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/UserGradeEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/UserGradeRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/UserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/scheduler/AutoMatchingScheduler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/service/UserServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/service/classification/UserGroup.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/service/search/MatchingUsers.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/service/search/MoodDistance.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../matching-service/src/main/resources/bootstrap.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/TotalUserScheduler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/scheduler/UserGroupScheduler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../SQL/CREATETABLE.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../SQL/CREATETABLE.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apigateway-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../apigateway-service/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../docker-files/kafka-docker" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-files/kafka-docker" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/controller/PostController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/CommentDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/dto/CommentDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/CommentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/CommentRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/HashtagRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/HashtagRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/PostRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/jpa/PostRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/CommentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/CommentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/CommentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/CommentServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/service/PostServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/RequestComment.java" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/src/main/java/com/mood/postservice/vo/RequestComment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/MatchingServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/MatchingServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/controller/MatchingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/controller/MatchingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/MatchingEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/MatchingEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/MatchingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/jpa/MatchingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/service/MatchingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/service/MatchingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/service/MatchingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/service/MatchingServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/vo/MatchingData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/vo/MatchingData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/vo/ResponseMatchingUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/../matching-service/src/main/java/com/mood/matchingservice/vo/ResponseMatchingUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../matching-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../matching-service/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/client/MatchingServiceClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/dto/UserDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserGradeEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserGradeEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/jpa/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MatchingService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/MatchingServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/service/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/MatchingData.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestMatchingUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/RequestMatchingUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mood/userservice/vo/ResponseMatchingUser.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -173,6 +200,8 @@
       <workItem from="1634028957052" duration="3739000" />
       <workItem from="1634140000101" duration="1375000" />
       <workItem from="1634190629431" duration="555000" />
+      <workItem from="1634539704380" duration="12867000" />
+      <workItem from="1634570554223" duration="1491000" />
     </task>
     <servers />
   </component>

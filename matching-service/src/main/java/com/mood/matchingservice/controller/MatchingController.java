@@ -3,6 +3,7 @@ package com.mood.matchingservice.controller;
 import com.mood.matchingservice.auth.AuthorizationExtractor;
 import com.mood.matchingservice.auth.BearerAuthConverser;
 import com.mood.matchingservice.dto.MatchingUserDto;
+import com.mood.matchingservice.dto.UserDto;
 import com.mood.matchingservice.service.MatchingService;
 import com.mood.matchingservice.vo.RequestUser;
 import com.mood.matchingservice.vo.ResponseMatchingUser;
@@ -15,9 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
-@RequestMapping("/matching-service")
+@RequestMapping("/")
 public class MatchingController {
     private Environment env;
     private MatchingService matchingService;
@@ -50,27 +53,37 @@ public class MatchingController {
 
     //get MatchingUser for Androids
     @PostMapping("/getMatchingUsers")
-    public ResponseEntity getMatchingUsers(HttpServletRequest request, @RequestHeader String userToken){
+    public ResponseEntity<List<ResponseMatchingUser>> getMatchingUsers(HttpServletRequest request){
+        List<ResponseMatchingUser> returnList = new ArrayList<>();
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
         String userUid = bearerAuthConverser.handle(request, env);
-        if(userUid.equals(null)){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMatchingUser());
-        }
-        MatchingUserDto matchingUserDto = new MatchingUserDto();
-        matchingUserDto.setUserUid(userUid);
-        //get matching users
-        matchingService.getMatchingUsers();
-        //get user-service and get Matching user's data
-
-        //return matching users
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMatchingUser());
+        if(userUid.equals(null))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(returnList);
+        returnList = matchingService.getMatchingUsers(userUid);
+        return ResponseEntity.status(HttpStatus.OK).body(returnList);
     }
 
-    //get MatchingUSer for Server
-    @GetMapping("/getMatchingUsers")
-    public ResponseEntity getMatchingUsers(@RequestBody RequestUser requestUser){
-
-
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMatchingUser());
+    //get MatchingUser for Androids
+    @PostMapping("/updateMatchingTime/{protoType}")
+    public ResponseEntity<List<ResponseMatchingUser>> updateMatchingTime(HttpServletRequest request, @PathVariable String protoType) {
+        List<ResponseMatchingUser> returnList = new ArrayList<>();
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        BearerAuthConverser bearerAuthConverser = new BearerAuthConverser(new AuthorizationExtractor());
+        String userUid = bearerAuthConverser.handle(request, env);
+        if (userUid.equals(null))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(returnList);
+        if(protoType.equals("matching")||protoType.equals("profile")||protoType.equals("request")){
+            matchingService.updateMatchingTime(userUid);
+            return ResponseEntity.status(HttpStatus.OK).body(returnList);
+        }else if(protoType.equals("reset")){
+            if(matchingService.updateResetMatchingTime(userUid)) {
+                returnList = matchingService.getMatchingUsers(userUid);
+                return ResponseEntity.status(HttpStatus.OK).body(returnList);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(returnList);
     }
 }

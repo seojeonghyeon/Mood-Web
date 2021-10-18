@@ -192,6 +192,25 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/post-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
+        #MATCHING SERVICE - GET
+        - id: matching-service
+          uri: lb://MATCHING-SERVICE
+          predicates:
+            - Path=/matching-service/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/matching-service/(?<segment>.*), /$\{segment}
+        #MATCHING SERVICE -POST
+        - id: matching-service
+          uri: lb://MATCHING-SERVICE
+          predicates:
+            - Path=/matching-service/**
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/matching-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
 management:
   endpoints:
     web:

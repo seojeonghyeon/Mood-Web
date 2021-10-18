@@ -42,4 +42,6 @@ public interface UserService extends UserDetailsService {
     UserDetailEntity getUserDetail(String userUid);
     boolean checkNickname(UserDto userDto);
     boolean updatePhoneNum(String userUid, String phoneNum);
+    List<UserDto> getUsers();
+    void updateUserGroup(UserDto userDto);
 }
