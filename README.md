@@ -1,13 +1,17 @@
 # Mood-Web
-  Copyright 2021. 서정현, 김일준, Mood All Rights Reserved.
+  Copyright 2021. 서정현, 김일준 및 Mood 기획, 개발진 Mood All Rights Reserved.
   
   
   데이팅 앱(Mood)의 서버(Back-end)관련 개발 진행 중인 소스입니다. 본 코드는 수익과 관련이 있을 수 있으므로 무단 유출과 배포, 사용을 금지합니다.(2021.10.7)
   
   개인적인 소스 코드에 대한 Notion 확인이 가능합니다.
-  https://seojeonghyeon0630.notion.site/35a8b455c30d4255a5410934f3b3beba?v=e0f72e4a793f40c985120312b8bf854d
+  ```
+  Notion : https://seojeonghyeon0630.notion.site/35a8b455c30d4255a5410934f3b3beba?v=e0f72e4a793f40c985120312b8bf854d
+  ```
 
+* [Introduction](*introduction)
 * [DOCUMENT](#document)
+* [Point](#point)
 * [Server](#server)
 * [Docker](#docker)
 * [Mood-WEB](#mood-web)
@@ -20,11 +24,63 @@
 * [SQL](#sql)
 
 
+## Introduction
+- Server(Back-end) 1차 개발 진행상황
+![그림4](https://user-images.githubusercontent.com/24422677/137906684-0757e676-0cd6-4df2-9228-a4c790feb125.png)
+
+
+
+- Android Application
+<p float="center">
+  <img width="33%" alt="그림1" src="https://user-images.githubusercontent.com/24422677/137891508-f32fb44b-7e63-4ecf-af3f-f5e93aef550f.png">
+  <img width="33%" alt="그림2" src="https://user-images.githubusercontent.com/24422677/137893181-67ff4b16-65ba-4739-a749-d93a6b59e85f.png">
+  <img width="33%" alt="그림3" src="https://user-images.githubusercontent.com/24422677/137891977-eaa69668-09e2-4fb9-b416-b2475fd6a9b6.png">
+</p>
+
+짧은 개발기간과 인수인계에 대한 부담에 Kafka Server, 관리자서버(Vue.js or Nuxt.js)에 대한 구현은 2차 개발로 미루게 되었다.
+
 ## Document
-  This part is for communication protocol(Android and Back-end Server). Let's see the document
+  안드로이드와 서버 개발 간 사용한 통신 프로토콜이다.
   ```
   GitHub(Here) : https://github.com/seojeonghyeon/Mood-Web/tree/main/Communication%20Protocol
   ```
+
+## Point
+
+사용자가 매칭 서비스를 이용하게 되면, 사용자가 설정한 정보에 따라 알맞는 대상을 검색하게 된다. 이때, 최대한 두 사람의 Mood Distance가 유사하게 나와야 두 사람의 성향이 비슷하다는 것을 알 수 있기 때문에 같은 그룹으로 묶게 된다.
+
+1. Mood Distance 탐색(Algorithm to find the area of a polygon활용)
+<img width="100%" alt="스크린샷 2021-10-19 18 28 59" src="https://user-images.githubusercontent.com/24422677/137910827-362d4cf5-fbb1-48d6-a02c-bcf5f7c870d7.png">
+사람과 사람을 매칭할 때, 가입할 때 조사한 5가지 항목을 토대로 오각형을 그리게 된다. 위 사진에서 서로의 오각형의 모양이 비슷한 정도. 즉, 서로의 성향이 비슷한 정도가 Mood Distance이다.
+<img width="100%" alt="스크린샷 2021-10-19 18 29 17" src="https://user-images.githubusercontent.com/24422677/137911188-a3b3f7fb-9388-433f-931a-20ba8a4bea20.png">
+Mood Distance는 위 그림과 같이 교집합/합집합으로 계산한다. 계산된 값은 퍼센테이지로 표시된다. 그렇다면 해당 교집합 부분과 합집합 부분의 넓이를 어떻게 하면 구할 수 있을까?
+넓이를 구할 수 있는 방법에는 무수히 많지만 그 중에서 'Algorithm to find the area of a polygon'을 사용하기로 하였다. 해당 알고리즘은 각 점들의 좌표만 알게 된다면 해당 도형의 넓이값을 알 수 있다는 장점을 가지고 있다.
+
+<img width="100%" alt="스크린샷 2021-10-19 18 29 33" src="https://user-images.githubusercontent.com/24422677/137911859-fb8c2112-5d81-4e0c-8731-da454f3fcc46.png">
+그렇다면 'Algorithm to find the area of a polygon'이 무엇일까? 위 사진과 같이 점들이 주어진다고 하면 (x1,y1)부터 (x4,y4)까지의 비선형 함수와 x축까지의 넓이를 구한다고 한다면 아마 적분을 할 것이다. 위 알고리즘이 바로 그것이다. 각 점들의 위를 이용해서 직선을 만들고 각 직선을 적분하여 해당 도형의 넓이를 구하는 것이다. 이렇게 되면, 어떤 도형이든 각 점들의 좌표만 알면 도형의 넓이를 구할 수 있다.
+위 내용은 사이트(https://www.mathopenref.com/coordpolygonarea2.html)를 참고하였다.
+
+이제 점들의 좌표를 구해보자.
+먼저 오각형의 영역을 나누어주었다. 오각형은 각 점들이 일정한 각도를 이루고 있기 때문에 각도를 이용하여 선형함수를 구해 해당 선형함수 위에 값을 표시하면 되는것이다.
+<img width="100%" alt="스크린샷 2021-10-19 18 29 51" src="https://user-images.githubusercontent.com/24422677/137913367-6703602f-11e6-46da-8381-681531436616.png">
+위와 같이 영역을 나누어주게되면 해당영역에서 좌표를 찍을 경우 일어나는 현상은 크게 세가지이다.
+<p float="center">
+  <img width="33%" alt="스크린샷 2021-10-19 18 30 01" src="https://user-images.githubusercontent.com/24422677/137913605-96bdf87e-b330-4a0b-8965-e1981eac1fa6.png">
+  <img width="33%" alt="스크린샷 2021-10-19 18 30 41" src="https://user-images.githubusercontent.com/24422677/137913616-b6d96700-122a-49f8-a668-732fe2b7e82f.png">
+  <img width="33%" alt="스크린샷 2021-10-19 18 30 50" src="https://user-images.githubusercontent.com/24422677/137913632-33aca8cd-cb70-4ea4-9c41-6559eeafea18.png">
+</p>
+
+위 그림과 같이 (1)평행하거나 (2)겹치거나 (3)교점이 생긴다. 이를 토대로 처리를 해주면 충분히 정상적인 값이 나온다. 이를 각 각도에 맞춰 5개의 영역에 대해 실시하고 추출된 교점에 대해 Mood Distance를 구하면된다.
+
+
+2. 사용자 그룹 분류(Classification : Decision Tree)
+![그림6](https://user-images.githubusercontent.com/24422677/137914391-168b9fba-ee78-4a40-a80e-34fc4e0352f2.png)
+사용자의 그룹을 분류하는 큰 목적은 유사한 성향의 사용자들을 그룹지어 만족도를 높이는 것에 있다. 다양한 사용자가 존재하고 그에 따라 오각형의 모양도 저마다 다를 것이다.
+이때, 특이한 모양에 대해 따로 그룹을 묶어서 그룹에 묶이지 않은 사용자들에 대해서는 가우시안 분포에 이르도록 하는 것이다. 특이한 모양에 대해 정의를 하자면 (1)1가지 특성만 지나치게 높다. (2)2가지 특성만 지나치게 높다. (3) 1가지 특성만 지나치게 낮다. (4)2가지 특성만 지나치게 낮다. (5)전체적으로 Mood Distance(이때, Mood Distance는 (사용자의 오각형의 넓이/전체넓이)이다.)의 크기가 크다. (6)전체적으로 Mood Distance의 크기가 작다. 등이 된다. 특정 사용자에 대해 그룹화를 하여 매칭의 효율을 높여주는 역할을 해준다. 이후, 위 사진과 같이 가운데 분포한 사용자의 경우나 각 그룹에 사용자가 많아진다면 추가적인 영역을 나눠 피라미드 구조가 되도록 하여야 한다. 그래야 VIP가 이익을 보기 때문이다. 
+ 위 Classification을 사용하기 위해서는 다음과 같은 제약사항이 존재한다. (1)사용자의 수가 충분히 많아야 한다. (2)그룹이 너무 많다면 서비스가 제대로 될 수 없다. 이를 보안하기 위해서 주기적으로 사용자 수를 확인한다. 그리고 사용자 수에 대해 그룹의 수를 달리하여 매칭의 효율을 높인다.
+
+
+
 
 ## Server
 
@@ -229,3 +285,5 @@
 
 ## SQL
 
+
+<img width="489" alt="스크린샷 2021-10-19 18 28 59" src="https://user-images.githubusercontent.com/24422677/137883285-c6dfe5ab-05ca-4208-9400-41abaa0f1d9f.png">
