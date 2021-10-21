@@ -21,7 +21,6 @@
 * [MATCHING-SERVICE](#matching-service)
 * [LOCK-SERVICE](#lock-service)
 * [POST-SERVICE](#post-service)
-* [SQL](#sql)
 
 
 ## Introduction
@@ -317,45 +316,130 @@ MSA의 특성을 살리기 위해서 가장 기본적인 구조(EC2+Docker)를 �
       # Timezone 직접 명시
       SET GLOBAL time_zone='Asia/Seoul';
       set time_zone='Asia/Seoul';
+      
+      
+      # Docker 내 실행될 서버(Jar파일 형 이미지) 시간 설정
+      # EC2에서 시간 설정을 하더라도 Jar파일로 되어있는 Docker 이미지가 가동되면 Docker Container 내 서버가 자동으로 시간을 할당해줘서 따로 설정을 해주어야 함
+      # Application.java 파일 내 아래 코드를 추가
+      
+      @PostConstruct
+      public void started(){
+          TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+          log.info("현재 시각 : "+new Date());
+      }
+      
       ```
     
 
 ## Mood-Web
 
   Name Server(Eureka Server) / 해당 IP : 172.18.0.3
+  
+  
   Port : 8761
 
 
 ## Config-server
 
   Config-Service(Config-Server) / 해당 IP : 172.18.0.2
+
+
   Port : 8888
+  
+  
   GitHub : https://github.com/seojeonghyeon/mood-cloud-config
+  
+  
   비대칭키(pem파일)를 이용한 암호화, GitHub에 존재하는 dev.yml, test.yml, prod.yml 파일에 각각 단계에 맞게 서버 배포 시 연동, 사용자 토큰(Bearer Token)의 생명주기, 키 값, Gateway IP, SMS 웹발신을 위한 Secret 값들을 타 연동 서버와 공유
 
 
 ## Apigateway-server
   Apigateway-server(Spring Cloud Gateway) / 해당 IP : 172.18.0.8
+  
+  
   Port : 8000
+  
+  
   사용자 토큰(Bearer Token)에 대한 기본 인증 작업 및 예외처리 작업 등 설정, 요청에 대한 URL에 대해 어디로 가야할지 경로를 설정 등
 
 
 ## user-service
 
   사용자 서비스를 위한 기본 서버 / 해당 IP : 172.18.0.6
+  
+  
   Port : 0
+  
+  
+  구현되어 있는 기능
+  - 회원가입 시, 인증번호 발송(SMS)
+  - 회원가입 시, 인증번호 검증(SMS)
+  - 회원가입
+  - 이메일 중복 확인
+  - 닉네임 중복 확인
+  - 본인 인증 시, 인증번호 발송(SMS)
+  - 본인 인증 시, 인증번호 검증(SMS)
+  - 이메일 찾기
+  - 패스워드 찾기
+  - 패스워드 초기화
+  - 자동 로그인
+  - 프로필 조회(대상 사용자 정보 가져오기)
+  - VIP 구매
+  - 설정 변경(사용자 정보)
+  - 전화번호 차단(매칭되지 않게 끔, 매칭에서 제외)
+  - 차단된 전화번호 가져오기
+  - 전화번호 수정
+  - 채팅 열기
+  - (스케줄러) VIP에게 일정 주기로 Coin 지급 : 매일 밤 12시
+  - (스케줄러) 사용자 등급 최신화 : 매일 밤 12시 10분
+  - (스케줄러) 전체 사용자 수 최신화 : 매일 밤 12시 20분
+  - (스케줄러) 사용자 나이 최신화 : 매년 1월 1일
+  - (스케줄러) 사용자 그룹 최신화 : 매일 밤 12시 30분
+
   
 
 ## matching-service
 
+  매칭 서비스를 제공하기 위한 서버 / 해당 IP : 172.8.0.4
+  
+  Port : 0
+  
+  구현되어 있는 기능
+  - 매칭하기
+  - 매칭 시간 단축
+  - 매칭 대상 수정
+  - Classification : Decision Tree -> 사용자 그룹 분포
+  - Mood Distance Search -> Algorithm to find the area of a polygon
+  - (스케줄러) 매칭 시간에 도달하면 자동 매칭
+
 
 ## lock-service
 
+  불건전한 정보를 다루는 사용자를 통제하기 위한 서버 / 해당 IP : 172.8.0.9
+  
+  Port : 0
+  
+  구현되어 있는 기능
+  - 사용자 신고
+  - 사용자 Lock on
+  - 사용자 Lock off
+
+  구현되어야 할 기능
+  - 관리자 페이지 서버 추가
 
 ## post-service
 
+  게시물 서비스를 제공하기 위한 서버 / 해당 IP : 172.8.0.7
+  
+  Port : 0
+  
+  구현되어있는 기능
+  - 게시물 등록
+  - 게시물 수정
+  - 게시물 삭제
+  - 게시물 가져오기
+  - 게시물들 가져오기(대상 게시물)
+  - 게시물들 가져오기(Hash Tag 검색)
+  - 게시물들 가져오기(전체, 지역, 인기 게시물)
 
-## SQL
 
-
-<img width="489" alt="스크린샷 2021-10-19 18 28 59" src="https://user-images.githubusercontent.com/24422677/137883285-c6dfe5ab-05ca-4208-9400-41abaa0f1d9f.png">
