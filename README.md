@@ -84,6 +84,8 @@ Mood Distance는 위 그림과 같이 교집합/합집합으로 계산한다. �
 
 ## Server
 
+MSA의 특성을 살리기 위해서 가장 기본적인 구조(EC2+Docker)를 선택하였다. 이후 사업이 확장되고 사용자 수가 증가하게 된다면 서버를 나누어 효율적인 운영이 가능해지기 때문이다. 현재는 EC2 Server를 하나만 구동하여 서버 안에서 Docker로 다른 서버들을 나누어 실행하는 구조이다. 서버 가동 후 설치한 패키지는 apt-get, OpenJDK Java, Docker 등이 있다.
+
 1. 서버에 접속 방법
    - Mac OS(Terminal)
 
@@ -91,7 +93,7 @@ Mood Distance는 위 그림과 같이 교집합/합집합으로 계산한다. �
       sudo ssh -i ServerKey.pem ubuntu@ServerIP
       ```
       ```
-      ex. <code>sudo ssh -i /Users/zayden/Documents/Work/mood/KeyPair.pem ubuntu@15.0.0.0</code>
+      # ex. sudo ssh -i /Users/zayden/Documents/Work/mood/KeyPair.pem ubuntu@15.0.0.0
       ```
    - Windows
       Putty 사용(Googling)
@@ -103,7 +105,7 @@ Mood Distance는 위 그림과 같이 교집합/합집합으로 계산한다. �
      scp -i "ServerKey.pem" (-f : 폴더 전체 복사) 파일위치 및 파일 명 ubuntu@ServerIP:복사하고자하는위치
      ```
      ```
-     ex)  Folder :  scp -i "moodServerKey.pem" -f /Document/ ubuntu@ec2~~~~~~.apnortheast2.compute.amazonaws.com:/root/test/
+     # ex)  Folder :  scp -i "moodServerKey.pem" -f /Document/ ubuntu@ec2~~~~~~.apnortheast2.compute.amazonaws.com:/root/test/
           File   :  scp -i "moodServerKey.pem" /Document/abc.txt ubuntu@ec2~~~~~~.apnortheast2.compute.amazonaws.com:/root/test/
      ```
     
@@ -122,48 +124,69 @@ Mood Distance는 위 그림과 같이 교집합/합집합으로 계산한다. �
   1. Service File 생성
 
       (1) DockerFile생성
+      ```
+      # user-service의 Dockerfile
+      
+      FROM openjdk:17-ea-11-slim
+      VOLUME /tmp
+      COPY target/user-service-0.0.1.jar UserService.jar
+      ENTRYPOINT ["java","-jar","UserService.jar"]
+      ```
+      ```
+      # LocalPC에서 사용하던 MariaDB를 복사하기 위한 Dockerfile
+      
+      FROM mariadb
+      ENV MYSQL_ROOT_PASSWORD 00000000
+      ENV MYSQL_DATABASE mooddb
+      COPY ./mysql_data/mysql /var/lib/mysql
+      EXPOSE 3306
+      ENTRYPOINT ["mysqld", "--user=root"]
+      ```
     
     
       (2) 배포를 위한 파일(Jar)생성
     
-    
-      (3) 개발도구에서 maven package단계까지 실행 또는 명령어를 통한 maven 실행
-    
-        ex. target Folder가 보이는 Folder에서, (-DskipTests=true는 Test 단계를 통과해야하는 경우에 사용) 
+        개발도구에서 maven package단계까지 실행 또는 명령어를 통한 maven 실행
     
         ```
-        mvn clean compile package (-DskipTests=true)   
+        # 해당 프로젝트 내, targer파일이 보이는 위치에서 (-DskipTests=true는 Test 단계를 통과해야하는 경우에 사용)
+
+        mvn clean compile package -DskipTests=true
         ```
 
 
   2. Service File Build
-
-     DockerFile을 토대로 대상을 이미지화 한다. 
-     (DockerFile이 위치한 곳에서) (-t는 태그이름)
      ```
+     # DockerFile을 토대로 대상을 이미지화 한다.(DockerFile이 위치한 곳에서,  -t는 태그이름,  Version은 pom.xml에 명시한 버전 및 jar파일 생성할때 사용한 버전)
+     
      docker build --tag(or -t) (Docker계정)/(Service명):(Version) .(위치)
-     ```
-     ```
-     ex) docker build --tag seojeonghyeon0630/user-service:0.0.1 .
+     
+     # ex) docker build --tag seojeonghyeon0630/user-service:0.0.1 .
      ```
      
   3. Service File Push
      ```
-     docker push seojeonghyeon0630/mood-web:0.0.1
+     # Local에 존재하는 이미지 파일을 Docker Repository로 전송한다.
+     docker push seojeonghyeon0630/user-service:0.0.1
      ```
 
 
   4. Service File Pull
 
-
+     Container를 생성하고자 하는 위치로 가서 이미지 파일을 내려받는다. 
+     
      ```
-     docker pull seojeonghyeon0630/mood-web:0.0.1
+     docker pull seojeonghyeon0630/user-service:0.0.1
      ```
 
   5. Service File Run
 
      Docker Bridge Network 생성(172.18.0.1에서부터 subnet mask를 16으로)
      ```
+     # Gateway : 172.18.0.1
+     # Subnet  : 172.18.0.0/16
+     
+     
      docker network create --gateway 172.18.0.1 --subnet 172.18.0.0/16 mood-network
      ```
      
@@ -236,7 +259,7 @@ Mood Distance는 위 그림과 같이 교집합/합집합으로 계산한다. �
      grant all privileges on *.* to 'root'@'%' identified by '비밀번호';
      ```
      
-     User 서버도 유사하게 Build해서 컨테이너를 생성해주자. 
+     user-service, lock-service, post-service, matching-service도 유사하게 Build해서 컨테이너를 생성해주면된다. 다른것은 네임서버, Apigateway서버, Config서버 3개이다.
      ```
      docker run -d --network mood-network \
      --name user-service \
@@ -259,20 +282,69 @@ Mood Distance는 위 그림과 같이 교집합/합집합으로 계산한다. �
      Docker Log 지속 확인 : docker -f logs fa7
      ```
     
+    
+  7. (추가) Docker 내 UTF-8설정
+
+      ```
+      # 언어설정 확인
+      locale
+
+      # 시간설정 확인
+      Date
+
+      # 언어 및 시간설정
+      localedef -f UTF-8 -i ko_KR ko_KR.utf8
+      export LANG=ko_KR.utf8
+      export LC_ALL=ko_KR.utf8
 
 
+      # Container 내에 MariaDB에 접근하여 Databases 내 시간을 변경
+
+      # Databases 내 시간 설정(MySQL, MariaDB)
+
+      # 현재 시간 확인
+      SELECT now();
+      SELECT CURRENT_TIMESTAMP;
+
+      # Timezone 확인
+      select @@system_time_zone;
+      SHOW GLOBAL VARIABLES LIKE '%zone%';
+
+
+      # Timezone 변경
+      mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
+
+      # Timezone 직접 명시
+      SET GLOBAL time_zone='Asia/Seoul';
+      set time_zone='Asia/Seoul';
+      ```
+    
 
 ## Mood-Web
+
+  Name Server(Eureka Server) / 해당 IP : 172.18.0.3
+  Port : 8761
 
 
 ## Config-server
 
+  Config-Service(Config-Server) / 해당 IP : 172.18.0.2
+  Port : 8888
+  GitHub : https://github.com/seojeonghyeon/mood-cloud-config
+  비대칭키(pem파일)를 이용한 암호화, GitHub에 존재하는 dev.yml, test.yml, prod.yml 파일에 각각 단계에 맞게 서버 배포 시 연동, 사용자 토큰(Bearer Token)의 생명주기, 키 값, Gateway IP, SMS 웹발신을 위한 Secret 값들을 타 연동 서버와 공유
+
 
 ## Apigateway-server
+  Apigateway-server(Spring Cloud Gateway) / 해당 IP : 172.18.0.8
+  Port : 8000
+  사용자 토큰(Bearer Token)에 대한 기본 인증 작업 및 예외처리 작업 등 설정, 요청에 대한 URL에 대해 어디로 가야할지 경로를 설정 등
 
 
 ## user-service
 
+  사용자 서비스를 위한 기본 서버 / 해당 IP : 172.18.0.6
+  Port : 0
+  
 
 ## matching-service
 
