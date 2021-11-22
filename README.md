@@ -31,9 +31,9 @@
 
 - Android Application
 <p float="center">
-  <img width="33%" alt="그림1" src="https://user-images.githubusercontent.com/24422677/137891508-f32fb44b-7e63-4ecf-af3f-f5e93aef550f.png">
-  <img width="33%" alt="그림2" src="https://user-images.githubusercontent.com/24422677/137893181-67ff4b16-65ba-4739-a749-d93a6b59e85f.png">
-  <img width="33%" alt="그림3" src="https://user-images.githubusercontent.com/24422677/137891977-eaa69668-09e2-4fb9-b416-b2475fd6a9b6.png">
+  <img width="31%" alt="그림1" src="https://user-images.githubusercontent.com/24422677/137891508-f32fb44b-7e63-4ecf-af3f-f5e93aef550f.png">
+  <img width="31%" alt="그림2" src="https://user-images.githubusercontent.com/24422677/137893181-67ff4b16-65ba-4739-a749-d93a6b59e85f.png">
+  <img width="31%" alt="그림3" src="https://user-images.githubusercontent.com/24422677/137891977-eaa69668-09e2-4fb9-b416-b2475fd6a9b6.png">
 </p>
 
 짧은 개발기간과 인수인계에 대한 부담에 Kafka Server, 관리자서버(Vue.js or Nuxt.js)에 대한 구현은 2차 개발로 미루게 되었다.
@@ -64,9 +64,9 @@ Mood Distance는 위 그림과 같이 교집합/합집합으로 계산한다. �
 <img width="100%" alt="스크린샷 2021-10-19 18 29 51" src="https://user-images.githubusercontent.com/24422677/137913367-6703602f-11e6-46da-8381-681531436616.png">
 위와 같이 영역을 나누어주게되면 해당영역에서 좌표를 찍을 경우 일어나는 현상은 크게 세가지이다.
 <p float="center">
-  <img width="33%" alt="스크린샷 2021-10-19 18 30 01" src="https://user-images.githubusercontent.com/24422677/137913605-96bdf87e-b330-4a0b-8965-e1981eac1fa6.png">
-  <img width="33%" alt="스크린샷 2021-10-19 18 30 41" src="https://user-images.githubusercontent.com/24422677/137913616-b6d96700-122a-49f8-a668-732fe2b7e82f.png">
-  <img width="33%" alt="스크린샷 2021-10-19 18 30 50" src="https://user-images.githubusercontent.com/24422677/137913632-33aca8cd-cb70-4ea4-9c41-6559eeafea18.png">
+  <img width="31%" alt="스크린샷 2021-10-19 18 30 01" src="https://user-images.githubusercontent.com/24422677/137913605-96bdf87e-b330-4a0b-8965-e1981eac1fa6.png">
+  <img width="31%" alt="스크린샷 2021-10-19 18 30 41" src="https://user-images.githubusercontent.com/24422677/137913616-b6d96700-122a-49f8-a668-732fe2b7e82f.png">
+  <img width="31%" alt="스크린샷 2021-10-19 18 30 50" src="https://user-images.githubusercontent.com/24422677/137913632-33aca8cd-cb70-4ea4-9c41-6559eeafea18.png">
 </p>
 
 위 그림과 같이 (1)평행하거나 (2)겹치거나 (3)교점이 생긴다. 이를 토대로 처리를 해주면 충분히 정상적인 값이 나온다. 이를 각 각도에 맞춰 5개의 영역에 대해 실시하고 추출된 교점에 대해 Mood Distance를 구하면된다.
